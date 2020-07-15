@@ -57,7 +57,7 @@ namespace WpfApp1
             this.Width = rc.Width;
             this.Height = rc.Height;
             #endregion
-            
+
 
             //读取本地配置JSON文件
             LoadJsonData();
@@ -129,8 +129,12 @@ namespace WpfApp1
             dispatcherTimer.Tick += (s, e) =>
             {
                 //读取PLC工序步骤状态
-                var sta = ((uint)plc.Read(service.GetStaStr(config.StationNo))).ConvertToInt();
-                ModifyStep(sta, config.GWNo);
+                //左
+                var sta = ((uint)plc.Read(service.GetStaStr(config.Station1No))).ConvertToInt();
+                ModifyStep1(sta, config.GWNo, 0);
+                //右
+                var sta1 = ((uint)plc.Read(service.GetStaStr(config.Station2No))).ConvertToInt();
+                ModifyStep1(sta, config.GWNo, 1);
 
                 //型号获取
                 var type = ((uint)plc.Read(service.GetTypeStr(config.ProductNo))).ConvertToInt();
@@ -150,7 +154,7 @@ namespace WpfApp1
                 var temp = (string)plc.Read(DataType.DataBlock, 2000, codeStr.BarStr, VarType.String, 40);
                 var BarResult = (bool)plc.Read(codeStr.ResultStr);
                 //var cMark = (string)plc.Read(DataType.DataBlock, 2000, codeStr.BarStr, VarType.String, 5); //mark
-                if (!temp.IsNullOrEmpty() )
+                if (!temp.IsNullOrEmpty())
                 {
                     Barcode.Text = temp;
                     if (BarResult)
@@ -208,7 +212,7 @@ namespace WpfApp1
 
         private void LoadJsonData()
         {
-            using (var sr = File.OpenText("C:\\config\\config.json"))
+            using (var sr = File.OpenText("C:\\config\\config1.json"))
             {
                 string JsonStr = sr.ReadToEnd();
                 config = JsonConvert.DeserializeObject<ConfigData>(JsonStr);
@@ -222,12 +226,18 @@ namespace WpfApp1
                 case 1:
                     Step1.Text = list[0].Name;
                     StepImage1.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    StepImage21.Source = IFalse;
                     break;
                 case 2:
                     Step1.Text = list[0].Name;
                     Step2.Text = list[1].Name;
                     StepImage1.Source = IFalse;
                     StepImage2.Source = IFalse;
+                    Step1.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    StepImage1.Source = IFalse;
+                    StepImage22.Source = IFalse;
                     break;
                 case 3:
                     Step1.Text = list[0].Name;
@@ -236,6 +246,12 @@ namespace WpfApp1
                     StepImage1.Source = IFalse;
                     StepImage2.Source = IFalse;
                     StepImage3.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    Step23.Text = list[2].Name;
+                    StepImage21.Source = IFalse;
+                    StepImage22.Source = IFalse;
+                    StepImage23.Source = IFalse;
                     break;
                 case 4:
                     Step1.Text = list[0].Name;
@@ -246,6 +262,14 @@ namespace WpfApp1
                     StepImage2.Source = IFalse;
                     StepImage3.Source = IFalse;
                     StepImage4.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    Step23.Text = list[2].Name;
+                    Step24.Text = list[3].Name;
+                    StepImage21.Source = IFalse;
+                    StepImage22.Source = IFalse;
+                    StepImage23.Source = IFalse;
+                    StepImage24.Source = IFalse;
                     break;
                 case 5:
                     Step1.Text = list[0].Name;
@@ -258,6 +282,16 @@ namespace WpfApp1
                     StepImage3.Source = IFalse;
                     StepImage4.Source = IFalse;
                     StepImage5.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    Step23.Text = list[2].Name;
+                    Step24.Text = list[3].Name;
+                    Step25.Text = list[4].Name;
+                    StepImage21.Source = IFalse;
+                    StepImage22.Source = IFalse;
+                    StepImage23.Source = IFalse;
+                    StepImage24.Source = IFalse;
+                    StepImage25.Source = IFalse;
                     break;
                 case 6:
                     Step1.Text = list[0].Name;
@@ -272,6 +306,18 @@ namespace WpfApp1
                     StepImage4.Source = IFalse;
                     StepImage5.Source = IFalse;
                     StepImage6.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    Step23.Text = list[2].Name;
+                    Step24.Text = list[3].Name;
+                    Step25.Text = list[4].Name;
+                    Step26.Text = list[5].Name;
+                    StepImage21.Source = IFalse;
+                    StepImage22.Source = IFalse;
+                    StepImage23.Source = IFalse;
+                    StepImage24.Source = IFalse;
+                    StepImage25.Source = IFalse;
+                    StepImage26.Source = IFalse;
                     break;
                 case 7:
                     Step1.Text = list[0].Name;
@@ -288,119 +334,81 @@ namespace WpfApp1
                     StepImage5.Source = IFalse;
                     StepImage6.Source = IFalse;
                     StepImage7.Source = IFalse;
+                    Step21.Text = list[0].Name;
+                    Step22.Text = list[1].Name;
+                    Step23.Text = list[2].Name;
+                    Step24.Text = list[3].Name;
+                    Step25.Text = list[4].Name;
+                    Step26.Text = list[5].Name;
+                    Step27.Text = list[6].Name;
+                    StepImage21.Source = IFalse;
+                    StepImage22.Source = IFalse;
+                    StepImage23.Source = IFalse;
+                    StepImage24.Source = IFalse;
+                    StepImage25.Source = IFalse;
+                    StepImage26.Source = IFalse;
+                    StepImage27.Source = IFalse;
                     break;
-                case 8:
-                    Step1.Text = list[0].Name;
-                    Step2.Text = list[1].Name;
-                    Step3.Text = list[2].Name;
-                    Step4.Text = list[3].Name;
-                    Step5.Text = list[4].Name;
-                    Step6.Text = list[5].Name;
-                    Step7.Text = list[6].Name;
-                    Step8.Text = list[7].Name;
-                    StepImage1.Source = IFalse;
-                    StepImage2.Source = IFalse;
-                    StepImage3.Source = IFalse;
-                    StepImage4.Source = IFalse;
-                    StepImage5.Source = IFalse;
-                    StepImage6.Source = IFalse;
-                    StepImage7.Source = IFalse;
-                    StepImage8.Source = IFalse;
-                    break;
-                case 9:
-                    Step1.Text = list[0].Name;
-                    Step2.Text = list[1].Name;
-                    Step3.Text = list[2].Name;
-                    Step4.Text = list[3].Name;
-                    Step5.Text = list[4].Name;
-                    Step6.Text = list[5].Name;
-                    Step7.Text = list[6].Name;
-                    Step8.Text = list[7].Name;
-                    Step9.Text = list[8].Name;
-                    StepImage1.Source = IFalse;
-                    StepImage2.Source = IFalse;
-                    StepImage3.Source = IFalse;
-                    StepImage4.Source = IFalse;
-                    StepImage5.Source = IFalse;
-                    StepImage6.Source = IFalse;
-                    StepImage7.Source = IFalse;
-                    StepImage8.Source = IFalse;
-                    StepImage9.Source = IFalse;
-                    break;
-                case 10:
-                    Step1.Text = list[0].Name;
-                    Step2.Text = list[1].Name;
-                    Step3.Text = list[2].Name;
-                    Step4.Text = list[3].Name;
-                    Step5.Text = list[4].Name;
-                    Step6.Text = list[5].Name;
-                    Step7.Text = list[6].Name;
-                    Step8.Text = list[7].Name;
-                    Step9.Text = list[8].Name;
-                    Step10.Text = list[9].Name;
-                    StepImage1.Source = IFalse;
-                    StepImage2.Source = IFalse;
-                    StepImage3.Source = IFalse;
-                    StepImage4.Source = IFalse;
-                    StepImage5.Source = IFalse;
-                    StepImage6.Source = IFalse;
-                    StepImage7.Source = IFalse;
-                    StepImage8.Source = IFalse;
-                    StepImage9.Source = IFalse;
-                    StepImage10.Source = IFalse;
-                    break;
+
             }
             #endregion
         }
 
-        private void ModifyStep(int type, int GWNo)
+        private void ModifyStep1(int type, int GWNo, int mark)
         {
-            switch (GWNo)
+            if (mark == 0) //0左边
             {
-                case 20: //20工位
-                    switch (type)
-                    {
-                        case 10:
-                            StepImage1.Source = ITrue;
-                            StepImage2.Source = IFalse;
-                            StepImage3.Source = IFalse;
-                            StepImage4.Source = IFalse;
-                            break;
-                        case 20:
-                            StepImage2.Source = ITrue;
-                            break;
-                        case 100:
-                            StepImage3.Source = ITrue;
-                            break;
-                        case 110:
-                            StepImage4.Source = ITrue;
-                            break;
-                    }
-                    break;
-                case 40: //40工位
-                    switch (type)
-                    {
-                        case 10:
-                            StepImage1.Source = ITrue;
-                            StepImage2.Source = IFalse;
-                            StepImage3.Source = IFalse;
-                            StepImage4.Source = IFalse;
-                            StepImage5.Source = IFalse;
-                            break;
-                        case 20:
-                            StepImage2.Source = ITrue;
-                            break;
-                        case 30:
-                            StepImage3.Source = ITrue;
-                            break;
-                        case 35:
-                            StepImage4.Source = ITrue;
-                            break;
-                        case 40:
-                            StepImage5.Source = ITrue;
-                            break;
-                    }
-                    break;
+                switch (GWNo)
+                {
+                    case 20: //20工位
+                        switch (type)
+                        {
+                            case 10:
+                                StepImage1.Source = ITrue;
+                                StepImage2.Source = IFalse;
+                                StepImage3.Source = IFalse;
+                                StepImage4.Source = IFalse;
+                                break;
+                            case 20:
+                                StepImage2.Source = ITrue;
+                                break;
+                            case 100:
+                                StepImage3.Source = ITrue;
+                                break;
+                            case 110:
+                                StepImage4.Source = ITrue;
+                                break;
+                        }
+                        break;
+                    case 40: //40工位
+                        switch (type)
+                        {
+                            case 10:
+                                StepImage1.Source = ITrue;
+                                StepImage2.Source = IFalse;
+                                StepImage3.Source = IFalse;
+                                StepImage4.Source = IFalse;
+                                StepImage5.Source = IFalse;
+                                break;
+                            case 20:
+                                StepImage2.Source = ITrue;
+                                break;
+                            case 30:
+                                StepImage3.Source = ITrue;
+                                break;
+                            case 35:
+                                StepImage4.Source = ITrue;
+                                break;
+                            case 40:
+                                StepImage5.Source = ITrue;
+                                break;
+                        }
+                        break;
+                }
+            }
+            else if (mark == 1) //1 右边
+            {
+
             }
 
         }

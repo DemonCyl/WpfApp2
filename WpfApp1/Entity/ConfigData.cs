@@ -14,7 +14,9 @@ namespace WpfApp1.Entity
         public string IpAdress { get; set; }
 
         public int GWNo { get; set; }
-        public int StationNo { get; set; }
+        public int Station1No { get; set; }
+
+        public int Station2No { get; set; }
 
 
         public List<StationData> Station { get; set; }
