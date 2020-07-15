@@ -19,7 +19,9 @@ namespace WpfApp1.Entity
         public int Station2No { get; set; }
 
 
-        public List<StationData> Station { get; set; }
+        public List<StationData> Station1 { get; set; }
+
+        public List<StationData> Station2 { get; set; }
         public int GunNo { get; set; }
 
         public int ProductNo { get; set; }
