@@ -62,18 +62,36 @@ namespace WpfApp1
             //读取本地配置JSON文件
             LoadJsonData();
             Init();
-            //ainPageLoad();
+            //MainPageLoad();
             plc = new Plc(CpuType.S71200, config.IpAdress, 0, 1);
-
-            var result = plc.Open();
-            if (!plc.IsConnected)
+            switch (config.GWNo)
             {
-                PLCImage.Source = IFalse;
+
+                case 04051:
+                    TM_Copy.Text = "CC特性：\r\n \r\n        \r\n        ";
+                    break;
+                case 04062:
+                    TM_Copy.Text = "CC特性：\r\n \r\n        \r\n       ";
+                    break;
+            }
+
+            if (plc.IsAvailable)
+            {
+
+                var result = plc.Open();
+                if (!plc.IsConnected)
+                {
+                    PLCImage.Source = IFalse;
+                }
+                else
+                {
+                    PLCImage.Source = ITrue;
+                    DataReload();
+                }
             }
             else
             {
-                PLCImage.Source = ITrue;
-                DataReload();
+                PLCImage.Source = IFalse;
             }
 
         }
@@ -96,8 +114,6 @@ namespace WpfApp1
             SetStepData(count2, config.Station2, 2);
 
             ReList.Clear();
-            ZongType.Text = config.ProductType;
-            BarRule.Text = config.BarRule;
             pImage.Source = new BitmapImage(new Uri(config.ImageUri, UriKind.Absolute)); ;
             Logo.Source = ILogo;
 
@@ -138,100 +154,122 @@ namespace WpfApp1
                 var sta1 = (ushort)plc.Read(service.GetStaStr(config.Station2No));
                 ModifyStep1(sta, config.GWNo, 1);
 
-                //型号获取
-                var type = (ushort)plc.Read(service.GetTypeStr(config.ProductNo));
-                switch (type)
+                #region 型号获取
+                var type1 = (ushort)plc.Read(service.GetTypeStr(config.Product1No)); //left
+                var type2 = (ushort)plc.Read(service.GetTypeStr(config.Product2No)); //right
+                switch (type1)
                 {
                     case 1:
-                        XingHao.Text = "正驾";
+                        XingHao1.Text = "正驾";
                         break;
                     case 2:
-                        XingHao.Text = "副驾";
+                        XingHao1.Text = "副驾";
                         break;
                     default: break;
                 }
+                switch (type2)
+                {
+                    case 1:
+                        XingHao2.Text = "正驾";
+                        break;
+                    case 2:
+                        XingHao2.Text = "副驾";
+                        break;
+                    default: break;
+                }
+                #endregion
 
                 //BarCode Get
-                int k = 1;
-                Barcode1.Text = "";
-                Barcode2.Text = "";
-                Barcode3.Text = "";
-                BarYz.Text = "";
-                for (int i = 1; i <= config.BarNo; i++)
+                if (config.BarCount > 0)
                 {
-                    if (i == k)
+                    int k = config.BarNo;  //adress get;
+                    Barcode1.Text = "";
+                    Barcode2.Text = "";
+                    Barcode3.Text = "";
+                    Barcode4.Text = "";
+                    BarYz.Text = "";
+                    for (int i = 1; i <= config.BarCount; i++)
                     {
-
-                        codeStr = service.GetBarCodeStr(k);
-                        var temp = (string)plc.Read(DataType.DataBlock, 2000, codeStr.BarStr, VarType.String, 40);
-                        temp = temp.Trim();
-                        var BarResult = (bool)plc.Read(codeStr.ResultStr);
-                        if (!temp.IsNullOrEmpty())
+                        var i1 = i + k - 1;
+                        if (i1 == k)
                         {
-                            switch (i)
+                            codeStr = service.GetBarCodeStr(k);
+                            var temp = (string)plc.Read(DataType.DataBlock, 2000, codeStr.BarStr, VarType.String, 40);
+                            temp = temp.Trim();
+                            var BarResult = (bool)plc.Read(codeStr.ResultStr);
+                            if (!temp.IsNullOrEmpty())
                             {
-                                case 1:
-                                    Barcode1.Text = temp;
-                                    break;
-                                case 2:
-                                    Barcode2.Text = temp;
-                                    break;
-                                case 3:
-                                    Barcode3.Text = temp;
-                                    break;
+                                switch (i)
+                                {
+                                    case 1:
+                                        Barcode1.Text = temp;
+                                        break;
+                                    case 2:
+                                        Barcode2.Text = temp;
+                                        break;
+                                    case 3:
+                                        Barcode3.Text = temp;
+                                        break;
+                                    case 4:
+                                        Barcode4.Text = temp;
+                                        break;
+                                }
+                                if (BarResult)
+                                {
+                                    BarYz.Text = "比对成功";
+                                }
+                                else
+                                {
+                                    BarYz.Text = "比对失败";
+                                }
+                                k += 1;
                             }
-                            if (BarResult)
+                        }
+                    }
+                }   
+
+                #region 拧紧枪数据获取
+                ReList.Clear();
+                if (config.GunCount > 0)
+                {
+                    for (int i = 1; i <= config.GunCount; i++)
+                    {
+                        var i1 = i + config.GunNo - 1;
+                        GunStr = service.GetGunStr(i1);
+                        var torque1 = ((uint)plc.Read(GunStr.TorqueStr)).ConvertToDouble();
+                        torque1 = double.Parse(torque1.ToString("F2"));
+                        var angle1 = ((uint)plc.Read(GunStr.AngleStr)).ConvertToDouble();
+                        angle1 = double.Parse(angle1.ToString("F2"));
+                        var result1 = (bool)plc.Read(GunStr.ResultStr);
+                        string rest;
+                        if (torque1 != 0)
+                        {
+                            if (i == 1)
                             {
-                                BarYz.Text = "比对成功";
+                                ReList.Clear();
+                                markN = 0;
+                            }
+                            if (result1)
+                            {
+                                rest = "OK";
                             }
                             else
                             {
-                                BarYz.Text = "比对失败";
+                                rest = "NG";
                             }
-                            k += 1;
+                            markN += 1;
+                            ReList.Add(new GDbData(markN, torque1, angle1, rest));
+                            ReList.Sort((x, y) => -x.Num.CompareTo(y.Num));
+                            DataList.ItemsSource = null;
+                            DataList.ItemsSource = ReList;
+                            DataList.Items.Refresh();
                         }
-                    }
-                }
-
-                #region 拧紧枪数据获取
-                for (int i = 1; i <= config.GunNo; i++)
-                {
-                    GunStr = service.GetGunStr(i);
-                    var torque1 = ((uint)plc.Read(GunStr.TorqueStr)).ConvertToDouble();
-                    torque1 = double.Parse(torque1.ToString("F2"));
-                    var angle1 = ((uint)plc.Read(GunStr.AngleStr)).ConvertToDouble();
-                    angle1 = double.Parse(angle1.ToString("F2"));
-                    var result1 = (bool)plc.Read(GunStr.ResultStr);
-                    string rest;
-                    if (torque1 != 0)
-                    {
-                        if (i == 1)
-                        {
-                            ReList.Clear();
-                            markN = 0;
-                        }
-                        if (result1)
-                        {
-                            rest = "OK";
-                        }
-                        else
-                        {
-                            rest = "NG";
-                        }
-                        markN += 1;
-                        ReList.Add(new GDbData(markN, torque1, angle1, rest));
-                        ReList.Sort((x, y) => -x.Num.CompareTo(y.Num));
-                        DataList.ItemsSource = null;
-                        DataList.ItemsSource = ReList;
-                        DataList.Items.Refresh();
-                        //mark
                     }
                 }
                 #endregion
 
-
             };
-            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(100);
+            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(2);
             dispatcherTimer.Start();
         }
 
