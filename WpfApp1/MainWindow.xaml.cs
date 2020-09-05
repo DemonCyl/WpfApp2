@@ -68,10 +68,10 @@ namespace WpfApp1
             {
 
                 case 04051:
-                    TM_Copy.Text = "CC特性：\r\n \r\n        \r\n        ";
+                    TM_Copy.Text = "CC特性：\r\n \r\n       24 + 4 Nm\r\n       20 + 2 Nm ";
                     break;
                 case 04062:
-                    TM_Copy.Text = "CC特性：\r\n \r\n        \r\n       ";
+                    TM_Copy.Text = "CC特性：\r\n \r\n       24 + 4 Nm\r\n       ";
                     break;
             }
 
