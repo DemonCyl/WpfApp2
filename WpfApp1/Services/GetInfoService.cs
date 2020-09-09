@@ -131,6 +131,35 @@ using Entity;
             return str;
         }
 
+        public GDbStr GetGunStr2(int value)
+        {
+            GDbStr str = new GDbStr();
+            switch (value)
+            {
+                case 1:
+                    str.TorqueStr = "DB2000.DBD5442.0";
+                    str.AngleStr = "DB2000.DBD5446.0";
+                    str.ResultStr = "DB2000.DBX5450.0";
+                    break;
+                case 2:
+                    str.TorqueStr = "DB2000.DBD5452.0";
+                    str.AngleStr = "DB2000.DBD5456.0";
+                    str.ResultStr = "DB2000.DBX5460.0";
+                    break;
+                case 3:
+                    str.TorqueStr = "DB2000.DBD5462.0";
+                    str.AngleStr = "DB2000.DBD5466.0";
+                    str.ResultStr = "DB2000.DBX5470.0";
+                    break;
+                case 4:
+                    str.TorqueStr = "DB2000.DBD5472.0";
+                    str.AngleStr = "DB2000.DBD5476.0";
+                    str.ResultStr = "DB2000.DBX5480.0";
+                    break;
+            }
+            return str;
+        }
+
         public BarCodeStr GetBarCodeStr(int value)
         {
             var tmp = value+1;
@@ -138,6 +167,41 @@ using Entity;
             str.BarStr = value*100+10;
             str.ResultStr = "DB2000.DBX"+tmp+"08.0";
             return str;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="GWNo">工位序号</param>
+        /// <param name="type">界面左右0左1右</param>
+        /// <returns></returns>
+        public int GetNewBarCodeStr(int GWNo,int type)
+        {
+            int firstStr = 0;
+            switch (GWNo)
+            {
+                case 04051:
+                    if (type == 0) //left
+                    {
+                        firstStr = 4578;
+                    }
+                    else if (type == 1) //right
+                    {
+                        firstStr = 4290;
+                    }
+                    break;
+                case 04062:
+                    if (type == 0) //left
+                    {
+                        firstStr = 4578;
+                    }
+                    else if (type == 1) //right
+                    {
+                        firstStr = 4886;
+                    }
+                    break;
+            }
+            return firstStr;
         }
     }
 }
