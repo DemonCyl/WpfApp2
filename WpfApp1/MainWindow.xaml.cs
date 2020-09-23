@@ -190,7 +190,7 @@ namespace WpfApp1
                     }
                     else
                     {
-                        log.Error("工序步骤状态读取失败");
+                        throw new Exception("工序步骤状态读取失败");
                     }
                     //右
                     //var sta1 = (ushort)plc.Read(service.GetStaStr(config.Station2No));
@@ -202,7 +202,7 @@ namespace WpfApp1
                     }
                     else
                     {
-                        log.Error("工序步骤状态读取失败");
+                        throw new Exception("工序步骤状态读取失败");
                     }
 
                     #region 型号获取
@@ -224,7 +224,7 @@ namespace WpfApp1
                     }
                     else
                     {
-                        log.Error("型号读取失败");
+                        throw new Exception("型号读取失败");
                     }
                     var type2 = splc.ReadUInt16(service.GetTypeStr(config.Product2No));
                     if (type2.IsSuccess)
@@ -242,7 +242,7 @@ namespace WpfApp1
                     }
                     else
                     {
-                        log.Error("型号读取失败");
+                        throw new Exception("型号读取失败");
                     }
                     //switch (type1)
                     //{
@@ -349,10 +349,20 @@ namespace WpfApp1
                         {
                             lCode = lResult.Content.Trim();
                         }
+                        else
+                        {
+                            throw new Exception("条码读取失败！");
+                        }
+
                         if (rResult.IsSuccess)
                         {
                             rCode = rResult.Content.Trim();
                         }
+                        else
+                        {
+                            throw new Exception("条码读取失败！");
+                        }
+
                         if (!lCode.IsNullOrEmpty())
                         {
                             switch (i)
@@ -419,14 +429,29 @@ namespace WpfApp1
                             {
                                 torque1 = double.Parse(t.Content.ToString("F2"));
                             }
+                            else
+                            {
+                                throw new Exception("扭矩读取失败！");
+                            }
+
                             if (a.IsSuccess)
                             {
                                 angle1 = double.Parse(a.Content.ToString("F2"));
                             }
+                            else
+                            {
+                                throw new Exception("角度读取失败！");
+                            }
+
                             if (r.IsSuccess)
                             {
                                 result1 = r.Content;
                             }
+                            else
+                            {
+                                throw new Exception("结果读取失败！");
+                            }
+
                             string rest;
                             if (torque1 != 0)
                             {
@@ -472,14 +497,29 @@ namespace WpfApp1
                                 {
                                     torque1 = double.Parse(t.Content.ToString("F2"));
                                 }
+                                else
+                                {
+                                    throw new Exception("扭矩读取失败！");
+                                }
+
                                 if (a.IsSuccess)
                                 {
                                     angle1 = double.Parse(a.Content.ToString("F2"));
                                 }
+                                else
+                                {
+                                    throw new Exception("角度读取失败！");
+                                }
+
                                 if (r.IsSuccess)
                                 {
                                     result1 = r.Content;
                                 }
+                                else
+                                {
+                                    throw new Exception("角度读取失败！");
+                                }
+
                                 string rest;
                                 if (torque1 != 0)
                                 {
