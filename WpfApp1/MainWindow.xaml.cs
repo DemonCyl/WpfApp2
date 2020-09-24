@@ -33,10 +33,9 @@ namespace WpfApp1
     public partial class MainWindow : Window
     {
 
-        private string _message = "服务器连接异常！";
-        private static double mark = 233.33;
         private GetInfoService service = new GetInfoService();
         private DispatcherTimer ShowTimer;
+        private DispatcherTimer timer;
         private ConfigData config;
         private BarCodeStr codeStr;
         //private Plc plc;
@@ -45,6 +44,7 @@ namespace WpfApp1
         private GDbStr GunStr;
         private int markN = 0;
         private List<GDbData> ReList = new List<GDbData>();
+        private bool remark = false;
         //private static BitmapImage IStation = new BitmapImage(new Uri("C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute));  //"C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute
         private static BitmapImage ILogo = new BitmapImage(new Uri("/Images/logo.png", UriKind.Relative));
         private static BitmapImage IFalse = new BitmapImage(new Uri("/Images/01.png", UriKind.Relative));
@@ -86,19 +86,12 @@ namespace WpfApp1
                         break;
                 }
 
-                connect = splc.ConnectServer();
-                if (connect.IsSuccess)
-                {
-                    PLCImage.Source = ITrue;
-                    log.Info("PLC Connected!");
-
-                    DataReload();
-                }
-                else
-                {
-                    PLCImage.Source = IFalse;
-                    log.Info("PLC Not Connected!");
-                }
+                #region PLC连接定时器
+                timer = new System.Windows.Threading.DispatcherTimer();
+                timer.Tick += new EventHandler(ThreadCheck);
+                timer.Interval = new TimeSpan(0, 0, 0, 5);
+                timer.Start();
+                #endregion
                 //if (plc.IsAvailable)
                 //{
 
@@ -120,7 +113,8 @@ namespace WpfApp1
                 //    PLCImage.Source = IFalse;
                 //    log.Info("PLC Not Connected!");
                 //}
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 log.Error(e.Message);
             }
@@ -898,22 +892,47 @@ namespace WpfApp1
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (MessageBoxX.Show("是否要关闭？", "确认", Application.Current.MainWindow, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            //if (MessageBoxX.Show("是否要关闭？", "确认", Application.Current.MainWindow, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            //{
+            //    e.Cancel = false;
+            //    //if (plc.IsConnected)
+            //    //{
+            //    //    plc.Close();
+            //    //    log.Info("PLC Disconnected!");
+            //    //}
+            //    if (connect.IsSuccess)
+            //    {
+            //        splc.ConnectClose();
+            //    }
+            //}
+            //else
+            //{
+            //    e.Cancel = true;
+            //}
+            if (connect.IsSuccess)
             {
-                e.Cancel = false;
-                //if (plc.IsConnected)
-                //{
-                //    plc.Close();
-                //    log.Info("PLC Disconnected!");
-                //}
-                if (connect.IsSuccess)
+                splc.ConnectClose();
+            }
+            log.Info("PLC Disconnected!");
+        }
+
+        public void ThreadCheck(object sender, EventArgs e)
+        {
+            OperateResult<short> connect = splc.ReadInt16("DB2000.0");
+            if (connect.IsSuccess)
+            {
+                PLCImage.Source = ITrue;
+                log.Info("PLC Connected!");
+
+                if (!remark)
                 {
-                    splc.ConnectClose();
+                    DataReload();
                 }
             }
             else
             {
-                e.Cancel = true;
+                PLCImage.Source = IFalse;
+                log.Info("PLC Not Connected!");
             }
         }
     }
