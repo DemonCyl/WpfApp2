@@ -86,6 +86,8 @@ namespace WpfApp1
                         break;
                 }
 
+                connect = splc.ConnectServer();
+
                 #region PLC连接定时器
                 timer = new System.Windows.Threading.DispatcherTimer();
                 timer.Tick += new EventHandler(ThreadCheck);
@@ -341,7 +343,15 @@ namespace WpfApp1
                         var rResult = splc.ReadString(rStr, config.BarLengh);
                         if (lResult.IsSuccess)
                         {
-                            lCode = lResult.Content.Trim();
+                            lCode = lResult.Content.Replace("\0", "").Trim();
+                            if (lCode.Length > 1)
+                            {
+                                lCode = lCode.Substring(1, lCode.Length - 1);
+                            }
+                            else
+                            {
+                                lCode = null;
+                            }
                         }
                         else
                         {
@@ -350,7 +360,15 @@ namespace WpfApp1
 
                         if (rResult.IsSuccess)
                         {
-                            rCode = rResult.Content.Trim();
+                            rCode = rResult.Content.Replace("\0", "").Trim();
+                            if (rCode.Length > 1)
+                            {
+                                rCode = rCode.Substring(1, rCode.Length - 1);
+                            }
+                            else
+                            {
+                                rCode = null;
+                            }
                         }
                         else
                         {
@@ -922,7 +940,7 @@ namespace WpfApp1
             if (check.IsSuccess)
             {
                 PLCImage.Source = ITrue;
-                log.Info("PLC Connected!");
+                //log.Info("PLC Connected!");
 
                 if (!remark)
                 {
@@ -932,7 +950,7 @@ namespace WpfApp1
             else
             {
                 PLCImage.Source = IFalse;
-                log.Info("PLC Not Connected!");
+                //log.Info("PLC Not Connected!");
             }
         }
     }

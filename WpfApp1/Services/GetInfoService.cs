@@ -198,7 +198,7 @@ using Entity;
                     }
                     else if (type == 1) //right
                     {
-                        firstStr = 4886;
+                        firstStr = 4866;
                     }
                     break;
             }
