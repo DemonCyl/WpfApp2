@@ -22,12 +22,61 @@
                         </LinearGradientBrush>
                     </Border.BorderBrush>
                 </Border>
-                <Border VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="0" BorderThickness="2" Height="268" Width="335" Canvas.Top="59">
+                <Border VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="0" BorderThickness="2" Height="268" Width="170" Canvas.Top="59">
                     <Border.BorderBrush>
                         <LinearGradientBrush SpreadMethod="Repeat" StartPoint="0, 5" EndPoint="5, 0" MappingMode="Absolute">
                             <GradientStop Color="White" Offset="0"/>
                         </LinearGradientBrush>
                     </Border.BorderBrush>
+                    <ListView x:Name="listViewL" ItemsSource="{Binding .}"  Background="SteelBlue" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Stretch" FlowDirection="LeftToRight">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" ></RowDefinition>
+                                        <RowDefinition Height="Auto" ></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"></ColumnDefinition>
+                                        <ColumnDefinition Width="120"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding Status}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="15" Height="13"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" TextWrapping="Wrap"
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                    <TextBlock Text="{Binding sType}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Visibility="Hidden"
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+                <Border VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="0" BorderThickness="2" Height="268" Width="170" Canvas.Top="59" Canvas.Left="167">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush SpreadMethod="Repeat" StartPoint="0, 5" EndPoint="5, 0" MappingMode="Absolute">
+                            <GradientStop Color="White" Offset="0"/>
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <ListView x:Name="listViewR" ItemsSource="{Binding .}"  Background="SteelBlue" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Stretch" FlowDirection="LeftToRight">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" ></RowDefinition>
+                                        <RowDefinition Height="Auto" ></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20"></ColumnDefinition>
+                                        <ColumnDefinition Width="120"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding Status}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="15" Height="13"/>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" TextWrapping="Wrap"
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                    <TextBlock Text="{Binding sType}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Visibility="Hidden"
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Border>
                 <Border VerticalAlignment="Center" HorizontalAlignment="Center" CornerRadius="0" BorderThickness="2" Height="112" Width="181" Canvas.Top="327" Canvas.Left="335">
                     <Border.BorderBrush>
@@ -216,9 +265,9 @@
                 <Image x:Name="StepImage25" Width="15" Height="13" Canvas.Left="197" Canvas.Top="208" />
                 <Image x:Name="StepImage26" Width="15" Height="13" Canvas.Left="197" Canvas.Top="244" />
                 <Image x:Name="StepImage27" Width="15" Height="13" Canvas.Left="197" Canvas.Top="280" />
-                <TextBlock x:Name="PLCSta_Copy" HorizontalAlignment="Center" Foreground="#F0E68C" FontFamily="Microsoft Yahei"
+                <TextBlock x:Name="PLCSta_Copy" HorizontalAlignment="Center" Foreground="#F0E68C" FontFamily="Microsoft Yahei" Visibility="Hidden"
                     TextWrapping="Wrap" Text="左:" VerticalAlignment="Center" Height="13" Width="13" FontSize="10" Canvas.Left="5" Canvas.Top="64"/>
-                <TextBlock x:Name="PLCSta_Copy1" HorizontalAlignment="Center" Foreground="#F0E68C" FontFamily="Microsoft Yahei"
+                <TextBlock x:Name="PLCSta_Copy1" HorizontalAlignment="Center" Foreground="#F0E68C" FontFamily="Microsoft Yahei" Visibility="Hidden"
                     TextWrapping="Wrap" Text="右:" VerticalAlignment="Center" Height="13" Width="13" FontSize="10" Canvas.Left="179" Canvas.Top="64"/>
                 <TextBlock x:Name="Barcode2" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="159" Canvas.Left="165" Canvas.Top="376"/>
