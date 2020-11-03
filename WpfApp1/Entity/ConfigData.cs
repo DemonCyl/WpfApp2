@@ -51,5 +51,8 @@ namespace WpfApp1.Entity
         public string ImageUri { get; set; }
 
         public ushort BarLengh { get; set; }
+
+        public List<InfoData> InfoData1 { get; set; }
+        public List<InfoData> InfoData2 { get; set; }
     }
 }

@@ -94,7 +94,7 @@ namespace WpfApp1
                 #region PLC连接定时器
                 timer = new System.Windows.Threading.DispatcherTimer();
                 timer.Tick += new EventHandler(ThreadCheck);
-                timer.Interval = new TimeSpan(0, 0, 0, 5);
+                timer.Interval = new TimeSpan(0, 0, 0, 15);
                 timer.Start();
                 #endregion
 
@@ -251,6 +251,7 @@ namespace WpfApp1
                     var type1 = splc.ReadUInt16(service.GetTypeStr(config.Product1No));
                     if (type1.IsSuccess)
                     {
+                        //log.Debug(type1.Content + "   " + service.GetTypeStr(config.Product1No));
                         switch (type1.Content)
                         {
                             case 1:
@@ -269,6 +270,7 @@ namespace WpfApp1
                     var type2 = splc.ReadUInt16(service.GetTypeStr(config.Product2No));
                     if (type2.IsSuccess)
                     {
+                        //log.Debug(type1.Content + " 2  " + service.GetTypeStr(config.Product2No));
                         switch (type2.Content)
                         {
                             case 1:
@@ -525,7 +527,7 @@ namespace WpfApp1
                                     rest = "NG";
                                 }
                                 markN += 1;
-                                ReList.Add(new GDbData(markN, torque1, angle1, rest));
+                                ReList.Add(new GDbData(i, torque1, angle1, rest));
                                 ReList.Sort((x, y) => -x.Num.CompareTo(y.Num));
                                 DataList.ItemsSource = null;
                                 DataList.ItemsSource = ReList;
@@ -600,12 +602,28 @@ namespace WpfApp1
                     }
                     #endregion
 
+                    //报警信息
+                    var infol = splc.ReadUInt16(service.GetErrorStr(config.Station1No));
+                    if (infol.IsSuccess)
+                    {
+                        var mesl = config.InfoData1.Find(f => f.Type == infol.Content);
+                        ErrorInfoLeft.Text = mesl == null ? "" : mesl.ErrorInfo;
+                    }
+                    var infor = splc.ReadUInt16(service.GetErrorStr(config.Station2No));
+                    if (infor.IsSuccess)
+                    {
+                        var mesr = config.InfoData2.Find(f => f.Type == infor.Content);
+                        ErrorInfoRight.Text = mesr == null ? "" : mesr.ErrorInfo;
+                    }
+
+                    remark = true;
                 }
                 catch (Exception exc)
                 {
                     log.Error("------PLC访问出错------");
                     log.Error(exc.Message);
                     dispatcherTimer.Stop();
+                    remark = false;
                 }
             };
             dispatcherTimer.Interval = TimeSpan.FromMilliseconds(2);
@@ -837,7 +855,18 @@ namespace WpfApp1
                 switch (GWNo)
                 {
                     case 04062: //工位
-                        if (type == 100)
+                        if (type == 0)
+                        {
+                            left.ForEach(f =>
+                            {
+                                f.Status = IFalse;
+                            });
+                            Barcode1.Text = "";
+                            Barcode2.Text = "";
+                            Barcode3.Text = "";
+                            Barcode4.Text = "";
+                        }
+                        else if (type == 100 || type == 110 || type == 300)
                         {
                             left.ForEach(f =>
                             {
@@ -905,7 +934,18 @@ namespace WpfApp1
                         //}
                         break;
                     case 04051: //工位
-                        if (type == 100)
+                        if (type == 0)
+                        {
+                            left.ForEach(f =>
+                            {
+                                f.Status = IFalse;
+                            });
+                            Barcode1.Text = "";
+                            Barcode2.Text = "";
+                            Barcode3.Text = "";
+                            Barcode4.Text = "";
+                        }
+                        else if (type == 100 || type == 110 || type == 300)
                         {
                             left.ForEach(f =>
                             {
@@ -958,7 +998,18 @@ namespace WpfApp1
                 switch (GWNo)
                 {
                     case 04062: //工位
-                        if (type == 100)
+                        if (type == 0)
+                        {
+                            right.ForEach(f =>
+                            {
+                                f.Status = IFalse;
+                            });
+                            Barcode1.Text = "";
+                            Barcode2.Text = "";
+                            Barcode3.Text = "";
+                            Barcode4.Text = "";
+                        }
+                        else if (type == 100 || type == 110 || type == 300)
                         {
                             right.ForEach(f =>
                             {
@@ -1026,7 +1077,18 @@ namespace WpfApp1
                         //}
                         break;
                     case 04051: //工位
-                        if (type == 100)
+                        if (type == 0)
+                        {
+                            right.ForEach(f =>
+                            {
+                                f.Status = IFalse;
+                            });
+                            Barcode1.Text = "";
+                            Barcode2.Text = "";
+                            Barcode3.Text = "";
+                            Barcode4.Text = "";
+                        }
+                        else if (type == 100 || type == 110 || type == 300)
                         {
                             right.ForEach(f =>
                             {
