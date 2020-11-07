@@ -25,6 +25,9 @@ using log4net;
 using HslCommunication;
 using HslCommunication.Profinet.Siemens;
 using System.Windows.Automation.Peers;
+using WpfApp1.DAL;
+using System.IO.Ports;
+using System.Threading;
 
 namespace WpfApp1
 {
@@ -37,13 +40,17 @@ namespace WpfApp1
         private GetInfoService service = new GetInfoService();
         private DispatcherTimer ShowTimer;
         private DispatcherTimer timer;
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
         private ConfigData config;
         private BarCodeStr codeStr;
+        private ProductConfig product;
+        private SerialPort serialPort;
         //private Plc plc;
         private SiemensS7Net splc;
         private OperateResult connect;
         private GDbStr GunStr;
         private int markN = 0;
+        private int barCount = 0;
         private List<GDbData> ReList = new List<GDbData>();
         private bool remark = false;
         //private static BitmapImage IStation = new BitmapImage(new Uri("C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute));  //"C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute
@@ -53,6 +60,9 @@ namespace WpfApp1
         private ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private List<GongXuModel> left = new List<GongXuModel>();
         private List<GongXuModel> right = new List<GongXuModel>();
+        private List<string> barList = new List<string>();
+        private List<string> yzList = new List<string>();
+        private MainDAL dal;
 
         public MainWindow()
         {
@@ -92,10 +102,10 @@ namespace WpfApp1
                 connect = splc.ConnectServer();
 
                 #region PLC连接定时器
-                timer = new System.Windows.Threading.DispatcherTimer();
-                timer.Tick += new EventHandler(ThreadCheck);
-                timer.Interval = new TimeSpan(0, 0, 0, 15);
-                timer.Start();
+                //timer = new System.Windows.Threading.DispatcherTimer();
+                //timer.Tick += new EventHandler(ThreadCheck);
+                //timer.Interval = new TimeSpan(0, 0, 0, 15);
+                //timer.Start();
                 #endregion
 
 
@@ -214,7 +224,7 @@ namespace WpfApp1
 
         private void DataReload()
         {
-            DispatcherTimer dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += (s, e) =>
             {
                 try
@@ -227,6 +237,15 @@ namespace WpfApp1
                     if (sta.IsSuccess)
                     {
                         ModifyStep1(sta.Content, config.GWNo, 0);
+
+                        if (sta.Content == 100) //PC 处理扫码  ???
+                        {
+                            this.PortConnection();
+                        }
+                        else
+                        {
+                            this.PortClose();
+                        }
                     }
                     else
                     {
@@ -248,63 +267,43 @@ namespace WpfApp1
                     #region 型号获取
                     //var type1 = (ushort)plc.Read(service.GetTypeStr(config.Product1No)); //left
                     //var type2 = (ushort)plc.Read(service.GetTypeStr(config.Product2No)); //right
-                    var type1 = splc.ReadUInt16(service.GetTypeStr(config.Product1No));
-                    if (type1.IsSuccess)
-                    {
-                        //log.Debug(type1.Content + "   " + service.GetTypeStr(config.Product1No));
-                        switch (type1.Content)
-                        {
-                            case 1:
-                                XingHao1.Text = "正驾";
-                                break;
-                            case 2:
-                                XingHao1.Text = "副驾";
-                                break;
-                            default: break;
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("型号读取失败");
-                    }
-                    var type2 = splc.ReadUInt16(service.GetTypeStr(config.Product2No));
-                    if (type2.IsSuccess)
-                    {
-                        //log.Debug(type1.Content + " 2  " + service.GetTypeStr(config.Product2No));
-                        switch (type2.Content)
-                        {
-                            case 1:
-                                XingHao2.Text = "正驾";
-                                break;
-                            case 2:
-                                XingHao2.Text = "副驾";
-                                break;
-                            default: break;
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("型号读取失败");
-                    }
-                    //switch (type1)
+                    //var type1 = splc.ReadUInt16(service.GetTypeStr(config.Product1No));
+                    //if (type1.IsSuccess)
                     //{
-                    //    case 1:
-                    //        XingHao1.Text = "正驾";
-                    //        break;
-                    //    case 2:
-                    //        XingHao1.Text = "副驾";
-                    //        break;
-                    //    default: break;
+                    //    //log.Debug(type1.Content + "   " + service.GetTypeStr(config.Product1No));
+                    //    switch (type1.Content)
+                    //    {
+                    //        case 1:
+                    //            XingHao1.Text = "正驾";
+                    //            break;
+                    //        case 2:
+                    //            XingHao1.Text = "副驾";
+                    //            break;
+                    //        default: break;
+                    //    }
                     //}
-                    //switch (type2)
+                    //else
                     //{
-                    //    case 1:
-                    //        XingHao2.Text = "正驾";
-                    //        break;
-                    //    case 2:
-                    //        XingHao2.Text = "副驾";
-                    //        break;
-                    //    default: break;
+                    //    throw new Exception("型号读取失败");
+                    //}
+                    //var type2 = splc.ReadUInt16(service.GetTypeStr(config.Product2No));
+                    //if (type2.IsSuccess)
+                    //{
+                    //    //log.Debug(type1.Content + " 2  " + service.GetTypeStr(config.Product2No));
+                    //    switch (type2.Content)
+                    //    {
+                    //        case 1:
+                    //            XingHao2.Text = "正驾";
+                    //            break;
+                    //        case 2:
+                    //            XingHao2.Text = "副驾";
+                    //            break;
+                    //        default: break;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    throw new Exception("型号读取失败");
                     //}
                     #endregion
 
@@ -359,107 +358,107 @@ namespace WpfApp1
                     #endregion
 
                     #region New BarcodeGet
-                    // Left BarCode
-                    int lStartAddr = service.GetNewBarCodeStr(config.GWNo, 0);
-                    // Right BarCode
-                    int rStartAddr = service.GetNewBarCodeStr(config.GWNo, 1);
+                    //// Left BarCode
+                    //int lStartAddr = service.GetNewBarCodeStr(config.GWNo, 0);
+                    //// Right BarCode
+                    //int rStartAddr = service.GetNewBarCodeStr(config.GWNo, 1);
 
-                    Barcode1.Text = "";
-                    Barcode2.Text = "";
-                    Barcode3.Text = "";
-                    Barcode4.Text = "";
-                    BarYz.Text = "";
-                    for (int i = 1; i <= 4; i++)
-                    {
-                        if (i != 1)
-                        {
-                            lStartAddr += 72;
-                            rStartAddr += 72;
-                        }
-                        string lStr = "DB2000." + lStartAddr;
-                        string rStr = "DB2000." + rStartAddr;
+                    //Barcode1.Text = "";
+                    //Barcode2.Text = "";
+                    //Barcode3.Text = "";
+                    //Barcode4.Text = "";
+                    //BarYz.Text = "";
+                    //for (int i = 1; i <= 4; i++)
+                    //{
+                    //    if (i != 1)
+                    //    {
+                    //        lStartAddr += 72;
+                    //        rStartAddr += 72;
+                    //    }
+                    //    string lStr = "DB2000." + lStartAddr;
+                    //    string rStr = "DB2000." + rStartAddr;
 
-                        //var lCode = (string)plc.Read(DataType.DataBlock, 2000, lStartAddr, VarType.String, config.BarLengh);
-                        //var rCode = (string)plc.Read(DataType.DataBlock, 2000, rStartAddr, VarType.String, config.BarLengh);
-                        //lCode = lCode.Trim();
-                        //rCode = rCode.Trim();
-                        string lCode = null;
-                        string rCode = null;
-                        var lResult = splc.ReadString(lStr, config.BarLengh);
-                        var rResult = splc.ReadString(rStr, config.BarLengh);
-                        if (lResult.IsSuccess)
-                        {
-                            lCode = lResult.Content.Replace("\0", "").Trim();
-                            if (lCode.Length > 1)
-                            {
-                                lCode = lCode.Substring(1, lCode.Length - 1);
-                            }
-                            else
-                            {
-                                lCode = null;
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("条码读取失败！");
-                        }
+                    //    //var lCode = (string)plc.Read(DataType.DataBlock, 2000, lStartAddr, VarType.String, config.BarLengh);
+                    //    //var rCode = (string)plc.Read(DataType.DataBlock, 2000, rStartAddr, VarType.String, config.BarLengh);
+                    //    //lCode = lCode.Trim();
+                    //    //rCode = rCode.Trim();
+                    //    string lCode = null;
+                    //    string rCode = null;
+                    //    var lResult = splc.ReadString(lStr, config.BarLengh);
+                    //    var rResult = splc.ReadString(rStr, config.BarLengh);
+                    //    if (lResult.IsSuccess)
+                    //    {
+                    //        lCode = lResult.Content.Replace("\0", "").Trim();
+                    //        if (lCode.Length > 1)
+                    //        {
+                    //            lCode = lCode.Substring(1, lCode.Length - 1);
+                    //        }
+                    //        else
+                    //        {
+                    //            lCode = null;
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        throw new Exception("条码读取失败！");
+                    //    }
 
-                        if (rResult.IsSuccess)
-                        {
-                            rCode = rResult.Content.Replace("\0", "").Trim();
-                            if (rCode.Length > 1)
-                            {
-                                rCode = rCode.Substring(1, rCode.Length - 1);
-                            }
-                            else
-                            {
-                                rCode = null;
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("条码读取失败！");
-                        }
+                    //    if (rResult.IsSuccess)
+                    //    {
+                    //        rCode = rResult.Content.Replace("\0", "").Trim();
+                    //        if (rCode.Length > 1)
+                    //        {
+                    //            rCode = rCode.Substring(1, rCode.Length - 1);
+                    //        }
+                    //        else
+                    //        {
+                    //            rCode = null;
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        throw new Exception("条码读取失败！");
+                    //    }
 
-                        if (!lCode.IsNullOrEmpty())
-                        {
-                            switch (i)
-                            {
-                                case 1:
-                                    Barcode1.Text = lCode;
-                                    break;
-                                case 2:
-                                    Barcode2.Text = lCode;
-                                    break;
-                                case 3:
-                                    Barcode1.Text = lCode;
-                                    break;
-                                case 4:
-                                    Barcode2.Text = lCode;
-                                    break;
-                            }
-                            BarYz.Text = "比对成功";
-                        }
-                        if (!rCode.IsNullOrEmpty())
-                        {
-                            switch (i)
-                            {
-                                case 1:
-                                    Barcode3.Text = rCode;
-                                    break;
-                                case 2:
-                                    Barcode4.Text = rCode;
-                                    break;
-                                case 3:
-                                    Barcode3.Text = rCode;
-                                    break;
-                                case 4:
-                                    Barcode4.Text = rCode;
-                                    break;
-                            }
-                            BarYz.Text = "比对成功";
-                        }
-                    }
+                    //    if (!lCode.IsNullOrEmpty())
+                    //    {
+                    //        switch (i)
+                    //        {
+                    //            case 1:
+                    //                Barcode1.Text = lCode;
+                    //                break;
+                    //            case 2:
+                    //                Barcode2.Text = lCode;
+                    //                break;
+                    //            case 3:
+                    //                Barcode1.Text = lCode;
+                    //                break;
+                    //            case 4:
+                    //                Barcode2.Text = lCode;
+                    //                break;
+                    //        }
+                    //        BarYz.Text = "比对成功";
+                    //    }
+                    //    if (!rCode.IsNullOrEmpty())
+                    //    {
+                    //        switch (i)
+                    //        {
+                    //            case 1:
+                    //                Barcode3.Text = rCode;
+                    //                break;
+                    //            case 2:
+                    //                Barcode4.Text = rCode;
+                    //                break;
+                    //            case 3:
+                    //                Barcode3.Text = rCode;
+                    //                break;
+                    //            case 4:
+                    //                Barcode4.Text = rCode;
+                    //                break;
+                    //        }
+                    //        BarYz.Text = "比对成功";
+                    //    }
+                    //}
 
                     #endregion
 
@@ -1198,6 +1197,199 @@ namespace WpfApp1
             {
                 PLCImage.Source = IFalse;
                 //log.Info("PLC Not Connected!");
+            }
+        }
+
+        private void Config_Click(object sender, RoutedEventArgs e)
+        {
+
+            ConfigWindow w = new ConfigWindow(config);
+            w.productHandler += new ConfigWindow.ProductHandler(ChildWin_Form);
+            w.Show();
+            w.Activate();
+        }
+
+        private void ChildWin_Form(object sender, ProductConfig pro)
+        {
+            yzList.Clear();
+            this.product = pro;
+            ZongType.Text = pro.FZCType;
+            switch (config.GWNo)
+            {
+                case 04051:
+                    switch (pro.FXingHao)
+                    {
+                        case 1:
+                            XingHao1.Text = "正驾";
+                            XingHao2.Text = "正驾";
+                            break;
+                        case 2:
+                            XingHao1.Text = "副驾";
+                            XingHao2.Text = "副驾";
+                            break;
+                    }
+                    break;
+                case 04062:
+                    XingHao1.Text = "正驾";
+                    XingHao2.Text = "副驾";
+                    break;
+            }
+            
+            BarRule.Text = pro.FCodeRule;
+            yzList.Add(pro.FCodeRule);
+            if (pro.FStatus1 == 1)
+            {
+                yzList.Add(pro.FCodeRule1);
+                BarRule.Text += "\r\n" + pro.FCodeRule1;
+            }
+            if (pro.FStatus2 == 1)
+            {
+                yzList.Add(pro.FCodeRule2);
+                BarRule.Text += "\r\n" + pro.FCodeRule2;
+            }
+            if (pro.FStatus3 == 1)
+            {
+                yzList.Add(pro.FCodeRule3);
+                BarRule.Text += "\r\n" + pro.FCodeRule3;
+            }
+
+            if (dispatcherTimer.IsEnabled)
+                dispatcherTimer.Stop();
+            remark = false;
+
+            // write plc data
+            string addressleft = null;
+            string addressright = null;
+            switch (config.GWNo)
+            {
+                case 04051:
+                    break;
+                case 04062:
+                    break;
+            }
+            //splc.Write(address, pro.FPLC);
+
+            #region PLC连接定时器
+            timer = new System.Windows.Threading.DispatcherTimer();
+            timer.Tick += new EventHandler(ThreadCheck);
+            timer.Interval = new TimeSpan(0, 0, 0, 5);
+            timer.Start();
+            #endregion
+        }
+
+        private bool PortConnection()
+        {
+            bool mark = false;
+            if (serialPort == null)
+            {
+                barList.Clear();
+                barCount = 0;
+                serialPort = new SerialPort(config.PortName, config.BaudRate, Parity.None, 8, StopBits.One);
+                serialPort.DtrEnable = true;
+                serialPort.RtsEnable = true;
+                serialPort.ReadTimeout = 100;
+                serialPort.DataReceived += serialPort_DataReceived;
+                mark = OpenPort();
+            }
+            return mark;
+        }
+
+        private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+                var serialPort = (SerialPort)sender;
+                //开启接收数据线程
+                Thread threadReceiveSub = new Thread(new ParameterizedThreadStart(ReceiveData));
+                threadReceiveSub.Start(serialPort);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void ReceiveData(object serialPortobj)
+        {
+            try
+            {
+                SerialPort serialPort = (SerialPort)serialPortobj;
+
+                //防止数据接收不完整 线程sleep(100)
+                Thread.Sleep(100);
+
+                string str = serialPort.ReadExisting();
+
+                if (str == string.Empty)
+                {
+                    return;
+                }
+                else
+                {
+                    BarCodeMatch(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void BarCodeMatch(string barcode)
+        {
+            // 防错
+            var fc = yzList.FindIndex(f => barcode.Contains(f));
+            if (fc != -1)
+            {
+                barList.Add(barcode);
+                barCount += 1;
+                // write plc ???
+            }
+
+            //上工序 ??
+
+            if (barCount == product.FCodeSum)
+            {
+                // write plc ???
+                splc.Write("", 1);
+            }
+
+            Dispatcher.InvokeAsync(() =>
+            {
+                Barcode1.Text = barcode;
+
+                BarYz.Text = fc != -1 ? "OK" : "NG";
+            });
+        }
+
+        private bool OpenPort()
+        {
+            string message = null;
+            try//这里写成异常处理的形式以免串口打不开程序崩溃
+            {
+                serialPort.Open();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+            if (serialPort.IsOpen)
+            {
+                log.Info("连接成功！");
+                return true;
+            }
+            else
+            {
+                log.Error("打开失败!原因为： " + message);
+                return false;
+            }
+        }
+
+        private void PortClose()
+        {
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
             }
         }
     }
