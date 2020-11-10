@@ -229,5 +229,92 @@ using Entity;
             return conn;
         }
 
+        public string GetSaoMaStr(int GWNo, int type)
+        {
+            string conn = null;
+            switch (GWNo)
+            {
+                case 04051:
+                    if (type == 0) //left
+                    {
+                        conn = "";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.510";
+                    }
+                    break;
+                case 04062:
+                    if (type == 0) //left
+                    {
+                        conn = "DB4000.1420";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.1421";
+                    }
+                    break;
+            }
+            return conn;
+        }
+
+        public string GetReadSaveStr(int GWNo, int type)
+        {
+            string conn = null;
+            switch (GWNo)
+            {
+                case 04051:
+                    if (type == 0) //left
+                    {
+                        conn = "DB4000.509";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.125";
+                    }
+                    break;
+                case 04062:
+                    if (type == 0) //left
+                    {
+                        conn = "DB4000.1420";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.1421";
+                    }
+                    break;
+            }
+            return conn;
+        }
+
+        public string GetWriteSaveStr(int GWNo, int type)
+        {
+            string conn = null;
+            switch (GWNo)
+            {
+                case 04051:
+                    if (type == 0) //left
+                    {
+                        conn = "DB4000.511";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.127";
+                    }
+                    break;
+                case 04062:
+                    if (type == 0) //left
+                    {
+                        conn = "DB4000.1420";
+                    }
+                    else if (type == 1) //right
+                    {
+                        conn = "DB4000.1421";
+                    }
+                    break;
+            }
+            return conn;
+        }
+
     }
 }

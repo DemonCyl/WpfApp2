@@ -53,6 +53,8 @@ namespace WpfApp1
         private int barCount = 0;
         private List<GDbData> ReList = new List<GDbData>();
         private bool remark = false;
+        private bool saveMark = false;
+        private bool saveMark1 = false;
         //private static BitmapImage IStation = new BitmapImage(new Uri("C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute));  //"C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute
         private static BitmapImage ILogo = new BitmapImage(new Uri("/Images/logo.png", UriKind.Relative));
         private static BitmapImage IFalse = new BitmapImage(new Uri("/Images/01.png", UriKind.Relative));
@@ -238,7 +240,7 @@ namespace WpfApp1
                     {
                         ModifyStep1(sta.Content, config.GWNo, 0);
 
-                        if (sta.Content == 100) //PC 处理扫码  ???
+                        if (sta.Content == 110) //PC 处理扫码  ???
                         {
                             this.PortConnection();
                         }
@@ -601,6 +603,70 @@ namespace WpfApp1
                     }
                     #endregion
 
+                    // 读取保存信号
+                    //var saveSingal = splc.ReadBool(service.GetReadSaveStr(config.GWNo,0));
+                    //if (saveSingal.IsSuccess)
+                    //{
+                    //    if (saveSingal.Content)
+                    //    {
+                    //        if (!saveMark)
+                    //        {
+                    //            string process = "";
+                    //            switch (config.GWNo)
+                    //            {
+                    //                case 04051:
+                    //                    process = "上部框架预装";
+                    //                    break;
+                    //                case 04062:
+                    //                    process = "H型滑轨装配";
+                    //                    break;
+                    //            }
+                    //            var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
+                    //            if (save)
+                    //            {
+                    //                splc.Write(service.GetWriteSaveStr(config.GWNo,0), true);
+                    //                saveMark = true;
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        saveMark = false;
+                    //    }
+                    //}
+
+                    //var saveSingal1 = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 1));
+                    //if (saveSingal1.IsSuccess)
+                    //{
+                    //    if (saveSingal1.Content)
+                    //    {
+                    //        if (!saveMark)
+                    //        {
+                    //            string process = "";
+                    //            switch (config.GWNo)
+                    //            {
+                    //                case 04051:
+                    //                    process = "前管装配";
+                    //                    break;
+                    //                case 04062:
+                    //                    process = "H型滑轨装配";
+                    //                    break;
+                    //            }
+                    //            var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
+                    //            if (save)
+                    //            {
+                    //                splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
+                    //                saveMark1 = true;
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        saveMark1 = false;
+                    //    }
+                    //}
+
+
                     //报警信息
                     var infol = splc.ReadUInt16(service.GetErrorStr(config.Station1No));
                     if (infol.IsSuccess)
@@ -865,7 +931,7 @@ namespace WpfApp1
                             Barcode3.Text = "";
                             Barcode4.Text = "";
                         }
-                        else if (type == 100 || type == 110 || type == 300)
+                        else if (type == 100 || type == 110 )
                         {
                             left.ForEach(f =>
                             {
@@ -944,7 +1010,7 @@ namespace WpfApp1
                             Barcode3.Text = "";
                             Barcode4.Text = "";
                         }
-                        else if (type == 100 || type == 110 || type == 300)
+                        else if (type == 100 || type == 110)
                         {
                             left.ForEach(f =>
                             {
@@ -1008,7 +1074,7 @@ namespace WpfApp1
                             Barcode3.Text = "";
                             Barcode4.Text = "";
                         }
-                        else if (type == 100 || type == 110 || type == 300)
+                        else if (type == 100 || type == 110)
                         {
                             right.ForEach(f =>
                             {
@@ -1087,7 +1153,7 @@ namespace WpfApp1
                             Barcode3.Text = "";
                             Barcode4.Text = "";
                         }
-                        else if (type == 100 || type == 110 || type == 300)
+                        else if (type == 100 || type == 110)
                         {
                             right.ForEach(f =>
                             {
@@ -1351,7 +1417,7 @@ namespace WpfApp1
             if (barCount == product.FCodeSum)
             {
                 // write plc ???
-                splc.Write("", 1);
+                splc.Write(service.GetSaoMaStr(config.GWNo,0), 2);
             }
 
             Dispatcher.InvokeAsync(() =>
