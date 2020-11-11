@@ -30,7 +30,7 @@ namespace WpfApp1
         private MainDAL dal;
         private ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private int mark = 0;
-        public delegate void ProductHandler(object sender, ProductConfig product);
+        public delegate void ProductHandler(object sender, ProductConfig product, ProductConfig product1);
         public event ProductHandler productHandler;
 
         public ConfigWindow(ConfigData data)
@@ -303,7 +303,7 @@ namespace WpfApp1
             var item = ZCItems.SelectedItem.ToString();
             var pro = list.Find(f => f.FZCType == item);
 
-            productHandler(this, pro);
+            productHandler(this, pro, pro);
 
             //this.Close();
         }

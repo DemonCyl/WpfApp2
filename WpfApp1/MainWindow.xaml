@@ -215,7 +215,7 @@
                 <TextBlock x:Name="Output" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="83" Canvas.Left="433" Canvas.Top="51"/>
                 <TextBlock x:Name="ZongType" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
-                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="18" Width="201" Canvas.Left="17" Canvas.Top="353"/>
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="201" Canvas.Left="17" Canvas.Top="353"/>
                 <TextBlock x:Name="XingHao1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="45" Canvas.Left="85" Canvas.Top="380"/>
                 <TextBlock x:Name="Data" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
@@ -223,7 +223,7 @@
                 <TextBlock x:Name="Barcode1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="159" Canvas.Left="165" Canvas.Top="336"/>
                 <TextBlock x:Name="BarRule" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
-                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="129" Canvas.Left="351" Canvas.Top="348"/>
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="81" Canvas.Left="340" Canvas.Top="348"/>
                 <TextBlock x:Name="BarYz" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="15" Width="47" Canvas.Left="392" Canvas.Top="416"/>
                 <TextBlock x:Name="Step1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
@@ -297,6 +297,10 @@
                 <Label FontSize="12" Foreground="#F0E68C" Content="报警(右):" FontFamily="Microsoft Yahei" Canvas.Left="436" Canvas.Top="441"/>
                 <TextBlock x:Name="ErrorInfoRight" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="12"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="18" Width="326" Canvas.Left="504" Canvas.Top="444"/>
+                <TextBlock x:Name="BarRule_Right" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="81" Canvas.Left="426" Canvas.Top="348"/>
+                <TextBlock x:Name="ZongType_Right" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="201" Canvas.Left="17" Canvas.Top="368"/>
 
                 <!--<ListView x:Name="listView_Copy" ItemsSource="{Binding .}" Canvas.Top="64" Height="264" Width="40" Background="#EE3BABFF" FontFamily="Microsoft Yahei" Canvas.Left="10" Foreground="White" >
                     <ListView.Resources>

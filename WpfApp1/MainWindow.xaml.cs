@@ -44,6 +44,7 @@ namespace WpfApp1
         private ConfigData config;
         private BarCodeStr codeStr;
         private ProductConfig product;
+        private ProductConfig rightproduct;
         private SerialPort serialPort;
         //private Plc plc;
         private SiemensS7Net splc;
@@ -51,6 +52,7 @@ namespace WpfApp1
         private GDbStr GunStr;
         private int markN = 0;
         private int barCount = 0;
+        private int rightbarCount = 0;
         private List<GDbData> ReList = new List<GDbData>();
         private List<GDbData> rightReList = new List<GDbData>();
         private bool remark = false;
@@ -66,6 +68,9 @@ namespace WpfApp1
         private List<string> barList = new List<string>();
         private List<string> rightbarList = new List<string>();
         private List<string> yzList = new List<string>();
+        private List<string> rightyzList = new List<string>();
+        private List<string> elist = new List<string>();
+        private List<string> rightelist = new List<string>();
         private MainDAL dal;
 
         public MainWindow()
@@ -615,17 +620,19 @@ namespace WpfApp1
                         {
                             if (!saveMark)
                             {
+                                bool save = false;
                                 string process = "";
                                 switch (config.GWNo)
                                 {
                                     case 04051:
                                         process = "上部框架预装";
+                                        save = dal.SaveInfo(product.FInterID, process, barList, null);
                                         break;
                                     case 04062:
                                         process = "H型滑轨装配";
+                                        save = dal.SaveInfo(product.FInterID, process, barList, ReList);
                                         break;
                                 }
-                                var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
                                 if (save)
                                 {
                                     splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
@@ -646,17 +653,19 @@ namespace WpfApp1
                         {
                             if (!saveMark1)
                             {
+                                bool save = false;
                                 string process = "";
                                 switch (config.GWNo)
                                 {
                                     case 04051:
                                         process = "前管装配";
+                                        save = dal.SaveInfo(product.FInterID, process, rightbarList, ReList);
                                         break;
                                     case 04062:
                                         process = "H型滑轨装配";
+                                        save = dal.SaveInfo(product.FInterID, process, rightbarList, rightReList);
                                         break;
                                 }
-                                var save = dal.SaveInfo(product.FInterID, process, rightbarList, ReList);
                                 if (save)
                                 {
                                     splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
@@ -1279,32 +1288,36 @@ namespace WpfApp1
             w.Activate();
         }
 
-        private void ChildWin_Form(object sender, ProductConfig pro)
+        private void ChildWin_Form(object sender, ProductConfig pro, ProductConfig proRight)
         {
             yzList.Clear();
             this.product = pro;
+            this.rightproduct = proRight;
             ZongType.Text = pro.FZCType;
-            switch (config.GWNo)
-            {
-                case 04051:
-                    switch (pro.FXingHao)
-                    {
-                        case 1:
-                            XingHao1.Text = "正驾";
-                            XingHao2.Text = "正驾";
-                            break;
-                        case 2:
-                            XingHao1.Text = "副驾";
-                            XingHao2.Text = "副驾";
-                            break;
-                    }
-                    break;
-                case 04062:
-                    XingHao1.Text = "正驾";
-                    XingHao2.Text = "副驾";
-                    break;
-            }
-            
+            ZongType_Right.Text = proRight.FZCType;
+            XingHao1.Text = "正驾";
+            XingHao2.Text = "正驾";
+            //switch (config.GWNo)
+            //{
+            //    case 04051:
+            //        switch (pro.FXingHao)
+            //        {
+            //            case 1:
+            //                XingHao1.Text = "正驾";
+            //                XingHao2.Text = "正驾";
+            //                break;
+            //            case 2:
+            //                XingHao1.Text = "副驾";
+            //                XingHao2.Text = "副驾";
+            //                break;
+            //        }
+            //        break;
+            //    case 04062:
+            //        XingHao1.Text = "正驾";
+            //        XingHao2.Text = "副驾";
+            //        break;
+            //}
+
             BarRule.Text = pro.FCodeRule;
             yzList.Add(pro.FCodeRule);
             if (pro.FStatus1 == 1)
@@ -1321,6 +1334,24 @@ namespace WpfApp1
             {
                 yzList.Add(pro.FCodeRule3);
                 BarRule.Text += "\r\n" + pro.FCodeRule3;
+            }
+
+            BarRule_Right.Text = proRight.FCodeRule;
+            rightyzList.Add(proRight.FCodeRule);
+            if (proRight.FStatus1 == 1)
+            {
+                rightyzList.Add(proRight.FCodeRule1);
+                BarRule_Right.Text += "\r\n" + proRight.FCodeRule1;
+            }
+            if (proRight.FStatus2 == 1)
+            {
+                rightyzList.Add(proRight.FCodeRule2);
+                BarRule_Right.Text += "\r\n" + proRight.FCodeRule2;
+            }
+            if (proRight.FStatus3 == 1)
+            {
+                rightyzList.Add(proRight.FCodeRule3);
+                BarRule_Right.Text += "\r\n" + proRight.FCodeRule3;
             }
 
             if (dispatcherTimer.IsEnabled)
@@ -1408,12 +1439,37 @@ namespace WpfApp1
         private void BarCodeMatch(string barcode)
         {
             // 防错
-            var fc = yzList.FindIndex(f => barcode.Contains(f));
-            if (fc != -1)
+            var fc = yzList.Find(f => barcode.Contains(f));
+            if (fc != null)
             {
-                barList.Add(barcode);
-                barCount += 1;
-                // write plc ???
+                if (elist.FindIndex(f => f.Equals(fc)) != -1)
+                {
+                    barList.Remove(barList.Find(bar => bar.Contains(fc)));
+
+                    barList.Add(barcode);
+                }
+                else
+                {
+                    elist.Add(fc);
+                    barList.Add(barcode);
+                    barCount += 1;
+                }
+            }
+            var fcr = rightyzList.Find(f => barcode.Contains(f));
+            if (fcr != null)
+            {
+                if (rightelist.FindIndex(f => f.Equals(fcr)) != -1)
+                {
+                    rightbarList.Remove(rightbarList.Find(bar => bar.Contains(fcr)));
+
+                    rightbarList.Add(barcode);
+                }
+                else
+                {
+                    rightelist.Add(fcr);
+                    rightbarList.Add(barcode);
+                    rightbarCount += 1;
+                }
             }
 
             //上工序 ??
@@ -1423,12 +1479,18 @@ namespace WpfApp1
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo,0), 2);
             }
+            if (rightbarCount == rightproduct.FCodeSum)
+            {
+                // write plc ???
+                splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
+            }
 
             Dispatcher.InvokeAsync(() =>
             {
                 Barcode1.Text = barcode;
 
-                BarYz.Text = fc != -1 ? "OK" : "NG";
+                BarYz.Text = fc != null ? "OK" : "NG";
+
             });
         }
 
