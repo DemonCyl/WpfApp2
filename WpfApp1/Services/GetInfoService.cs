@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WpfApp1.Services
 {
-using Entity;
+    using Entity;
     public class GetInfoService
     {
         public string GetStaStr(int value)
@@ -75,7 +75,7 @@ using Entity;
         public GDbStr GetGunStr(int value)
         {
             GDbStr str = new GDbStr();
-            switch(value)
+            switch (value)
             {
                 case 1:
                     str.TorqueStr = "DB2000.10"; //DBD
@@ -138,22 +138,22 @@ using Entity;
             {
                 case 1:
                     str.TorqueStr = "DB2000.5442";
-                    str.AngleStr =  "DB2000.5446";
+                    str.AngleStr = "DB2000.5446";
                     str.ResultStr = "DB2000.5450";
                     break;
                 case 2:
                     str.TorqueStr = "DB2000.5452";
-                    str.AngleStr =  "DB2000.5456";
+                    str.AngleStr = "DB2000.5456";
                     str.ResultStr = "DB2000.5460";
                     break;
                 case 3:
                     str.TorqueStr = "DB2000.5462";
-                    str.AngleStr =  "DB2000.5466";
+                    str.AngleStr = "DB2000.5466";
                     str.ResultStr = "DB2000.5470";
                     break;
                 case 4:
                     str.TorqueStr = "DB2000.5472";
-                    str.AngleStr =  "DB2000.5476";
+                    str.AngleStr = "DB2000.5476";
                     str.ResultStr = "DB2000.5480";
                     break;
             }
@@ -162,11 +162,11 @@ using Entity;
 
         public BarCodeStr GetBarCodeStr(int value)
         {
-            var tmp = value+1;
+            var tmp = value + 1;
             BarCodeStr str = new BarCodeStr();
             var i = value * 100 + 10;
             str.BarStr = "DB2000." + i;
-            str.ResultStr = "DB2000.DBX"+tmp+"08";
+            str.ResultStr = "DB2000.DBX" + tmp + "08";
             return str;
         }
 
@@ -176,7 +176,7 @@ using Entity;
         /// <param name="GWNo">工位序号</param>
         /// <param name="type">界面左右0左1右</param>
         /// <returns></returns>
-        public int GetNewBarCodeStr(int GWNo,int type)
+        public int GetNewBarCodeStr(int GWNo, int type)
         {
             int firstStr = 0;
             switch (GWNo)

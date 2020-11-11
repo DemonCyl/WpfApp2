@@ -52,6 +52,7 @@ namespace WpfApp1
         private int markN = 0;
         private int barCount = 0;
         private List<GDbData> ReList = new List<GDbData>();
+        private List<GDbData> rightReList = new List<GDbData>();
         private bool remark = false;
         private bool saveMark = false;
         private bool saveMark1 = false;
@@ -63,6 +64,7 @@ namespace WpfApp1
         private List<GongXuModel> left = new List<GongXuModel>();
         private List<GongXuModel> right = new List<GongXuModel>();
         private List<string> barList = new List<string>();
+        private List<string> rightbarList = new List<string>();
         private List<string> yzList = new List<string>();
         private MainDAL dal;
 
@@ -466,6 +468,7 @@ namespace WpfApp1
 
                     #region 拧紧枪数据获取
                     ReList.Clear();
+                    rightReList.Clear();
 
                     if (config.GunCount > 0)
                     {
@@ -591,6 +594,7 @@ namespace WpfApp1
                                         rest = "NG";
                                     }
                                     markN += 1;
+                                    rightReList.Add(new GDbData(markN, torque1, angle1, rest));
                                     ReList.Add(new GDbData(markN, torque1, angle1, rest));
                                     ReList.Sort((x, y) => -x.Num.CompareTo(y.Num));
                                     DataList.ItemsSource = null;
@@ -604,67 +608,67 @@ namespace WpfApp1
                     #endregion
 
                     // 读取保存信号
-                    //var saveSingal = splc.ReadBool(service.GetReadSaveStr(config.GWNo,0));
-                    //if (saveSingal.IsSuccess)
-                    //{
-                    //    if (saveSingal.Content)
-                    //    {
-                    //        if (!saveMark)
-                    //        {
-                    //            string process = "";
-                    //            switch (config.GWNo)
-                    //            {
-                    //                case 04051:
-                    //                    process = "上部框架预装";
-                    //                    break;
-                    //                case 04062:
-                    //                    process = "H型滑轨装配";
-                    //                    break;
-                    //            }
-                    //            var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
-                    //            if (save)
-                    //            {
-                    //                splc.Write(service.GetWriteSaveStr(config.GWNo,0), true);
-                    //                saveMark = true;
-                    //            }
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        saveMark = false;
-                    //    }
-                    //}
+                    var saveSingal = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 0));
+                    if (saveSingal.IsSuccess)
+                    {
+                        if (saveSingal.Content)
+                        {
+                            if (!saveMark)
+                            {
+                                string process = "";
+                                switch (config.GWNo)
+                                {
+                                    case 04051:
+                                        process = "上部框架预装";
+                                        break;
+                                    case 04062:
+                                        process = "H型滑轨装配";
+                                        break;
+                                }
+                                var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
+                                if (save)
+                                {
+                                    splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
+                                    saveMark = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            saveMark = false;
+                        }
+                    }
 
-                    //var saveSingal1 = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 1));
-                    //if (saveSingal1.IsSuccess)
-                    //{
-                    //    if (saveSingal1.Content)
-                    //    {
-                    //        if (!saveMark)
-                    //        {
-                    //            string process = "";
-                    //            switch (config.GWNo)
-                    //            {
-                    //                case 04051:
-                    //                    process = "前管装配";
-                    //                    break;
-                    //                case 04062:
-                    //                    process = "H型滑轨装配";
-                    //                    break;
-                    //            }
-                    //            var save = dal.SaveInfo(product.FInterID, process, barList, ReList);
-                    //            if (save)
-                    //            {
-                    //                splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
-                    //                saveMark1 = true;
-                    //            }
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        saveMark1 = false;
-                    //    }
-                    //}
+                    var saveSingal1 = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 1));
+                    if (saveSingal1.IsSuccess)
+                    {
+                        if (saveSingal1.Content)
+                        {
+                            if (!saveMark1)
+                            {
+                                string process = "";
+                                switch (config.GWNo)
+                                {
+                                    case 04051:
+                                        process = "前管装配";
+                                        break;
+                                    case 04062:
+                                        process = "H型滑轨装配";
+                                        break;
+                                }
+                                var save = dal.SaveInfo(product.FInterID, process, rightbarList, ReList);
+                                if (save)
+                                {
+                                    splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
+                                    saveMark1 = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            saveMark1 = false;
+                        }
+                    }
 
 
                     //报警信息
