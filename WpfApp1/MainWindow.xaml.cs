@@ -58,6 +58,7 @@ namespace WpfApp1
         private bool remark = false;
         private bool saveMark = false;
         private bool saveMark1 = false;
+        private bool IsOn = false;
         //private static BitmapImage IStation = new BitmapImage(new Uri("C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute));  //"C:\\Users\\Administrator\\Desktop\\cs.png", UriKind.Absolute
         private static BitmapImage ILogo = new BitmapImage(new Uri("/Images/logo.png", UriKind.Relative));
         private static BitmapImage IFalse = new BitmapImage(new Uri("/Images/01.png", UriKind.Relative));
@@ -72,6 +73,8 @@ namespace WpfApp1
         private List<string> elist = new List<string>();
         private List<string> rightelist = new List<string>();
         private MainDAL dal;
+        private bool leftMark = false;
+        private bool rightMark = false;
 
         public MainWindow()
         {
@@ -238,6 +241,14 @@ namespace WpfApp1
             {
                 try
                 {
+                    //读取在线 离线
+                    var IsOnMark = splc.ReadBool("DB25.182.6");
+                    if (IsOnMark.IsSuccess)
+                    {
+                        IsOn = IsOnMark.Content;
+                    }
+                    IsOnline.Text = IsOn ? "在线" : "离线";
+
                     //读取PLC工序步骤状态
                     //左
                     //var sta = (ushort)plc.Read(service.GetStaStr(config.Station1No));
@@ -247,14 +258,7 @@ namespace WpfApp1
                     {
                         ModifyStep1(sta.Content, config.GWNo, 0);
 
-                        if (sta.Content == 110) //PC 处理扫码  ???
-                        {
-                            this.PortConnection();
-                        }
-                        else
-                        {
-                            this.PortClose();
-                        }
+                        leftMark = (sta.Content == 110);
                     }
                     else
                     {
@@ -267,11 +271,24 @@ namespace WpfApp1
                     if (sta1.IsSuccess)
                     {
                         ModifyStep1(sta1.Content, config.GWNo, 1);
+
+                        rightMark = (sta.Content == 110);
                     }
                     else
                     {
                         throw new Exception("工序步骤状态读取失败");
                     }
+
+                    // 开始访问扫描枪
+                    if (leftMark || rightMark)
+                    {
+                        this.PortConnection();
+                    }
+                    else
+                    {
+                        this.PortClose();
+                    }
+
 
                     #region 型号获取
                     //var type1 = (ushort)plc.Read(service.GetTypeStr(config.Product1No)); //left
@@ -944,7 +961,7 @@ namespace WpfApp1
                             Barcode3.Text = "";
                             Barcode4.Text = "";
                         }
-                        else if (type == 100 || type == 110 )
+                        else if (type == 100 || type == 110)
                         {
                             left.ForEach(f =>
                             {
@@ -1284,39 +1301,37 @@ namespace WpfApp1
 
             ConfigWindow w = new ConfigWindow(config);
             w.productHandler += new ConfigWindow.ProductHandler(ChildWin_Form);
-            w.Show();
+            w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            w.ShowDialog();
             w.Activate();
         }
 
         private void ChildWin_Form(object sender, ProductConfig pro, ProductConfig proRight)
         {
             yzList.Clear();
+            rightyzList.Clear();
             this.product = pro;
             this.rightproduct = proRight;
             ZongType.Text = pro.FZCType;
             ZongType_Right.Text = proRight.FZCType;
-            XingHao1.Text = "正驾";
-            XingHao2.Text = "正驾";
-            //switch (config.GWNo)
-            //{
-            //    case 04051:
-            //        switch (pro.FXingHao)
-            //        {
-            //            case 1:
-            //                XingHao1.Text = "正驾";
-            //                XingHao2.Text = "正驾";
-            //                break;
-            //            case 2:
-            //                XingHao1.Text = "副驾";
-            //                XingHao2.Text = "副驾";
-            //                break;
-            //        }
-            //        break;
-            //    case 04062:
-            //        XingHao1.Text = "正驾";
-            //        XingHao2.Text = "副驾";
-            //        break;
-            //}
+            switch (pro.FXingHao)
+            {
+                case 1:
+                    XingHao1.Text = "正驾";
+                    break;
+                case 2:
+                    XingHao1.Text = "副驾";
+                    break;
+            }
+            switch (proRight.FXingHao)
+            {
+                case 1:
+                    XingHao2.Text = "正驾";
+                    break;
+                case 2:
+                    XingHao2.Text = "副驾";
+                    break;
+            }
 
             BarRule.Text = pro.FCodeRule;
             yzList.Add(pro.FCodeRule);
@@ -1384,6 +1399,8 @@ namespace WpfApp1
             if (serialPort == null)
             {
                 barList.Clear();
+                rightbarList.Clear();
+                rightbarCount = 0;
                 barCount = 0;
                 serialPort = new SerialPort(config.PortName, config.BaudRate, Parity.None, 8, StopBits.One);
                 serialPort.DtrEnable = true;
@@ -1477,7 +1494,7 @@ namespace WpfApp1
             if (barCount == product.FCodeSum)
             {
                 // write plc ???
-                splc.Write(service.GetSaoMaStr(config.GWNo,0), 2);
+                splc.Write(service.GetSaoMaStr(config.GWNo, 0), 2);
             }
             if (rightbarCount == rightproduct.FCodeSum)
             {

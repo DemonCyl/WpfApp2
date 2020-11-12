@@ -58,11 +58,15 @@
                 <TextBox x:Name="IdText"  Height="20" Width="55" pu:TextBoxHelper.FocusedBorderBrush="#B5B5B5" Text="" FontFamily="Microsoft Yahei" FontSize="13"
                     pu:TextBoxHelper.FocusedShadowColor="#B5B5B5" pu:TextBoxHelper.CornerRadius="7" Canvas.Left="24" Canvas.Top="6" Visibility="Hidden" />
                 <TextBlock x:Name="Info" Height="71" Canvas.Left="24" TextWrapping="Wrap" Text="" Canvas.Top="360" Width="323" FontSize="13" FontFamily="Microsoft Yahei" Foreground="#F0E68C"/>
-                <Button  Height="31" Width="89" Content="切换此产品" pu:ButtonHelper.ClickStyle="Sink" FontFamily="Microsoft Yahei" Background="White"  Foreground="Black"
-                    pu:ButtonHelper.HoverBrush="#FF8900" pu:ButtonHelper.CornerRadius="7" Canvas.Left="215" Canvas.Top="326" Click="Change_Click" />
+                <Button  Height="31" Width="70" Content="右侧产品" pu:ButtonHelper.ClickStyle="Sink" FontFamily="Microsoft Yahei" Background="White"  Foreground="Black"
+                    pu:ButtonHelper.HoverBrush="#FF8900" pu:ButtonHelper.CornerRadius="7" Canvas.Left="145" Canvas.Top="326" Click="Right_Click" />
                 <Label Content="条码总数:" FontSize="13" FontFamily="Microsoft Yahei" Foreground="#F0E68C" Canvas.Left="17" Canvas.Top="246" Width="105" HorizontalContentAlignment="Right"/>
                 <TextBox x:Name="CodeSum"  Height="27" Width="62" pu:TextBoxHelper.FocusedBorderBrush="#B5B5B5" Text="0" FontFamily="Microsoft Yahei" FontSize="13" InputMethod.IsInputMethodEnabled="False" PreviewTextInput="tb_PreviewTextInput"
                     pu:TextBoxHelper.FocusedShadowColor="#B5B5B5" pu:TextBoxHelper.CornerRadius="7" pu:TextBoxHelper.IsClearButtonVisible="True" Canvas.Left="127" Canvas.Top="246" />
+                <Button  Height="31" Width="70" Content="左侧产品" pu:ButtonHelper.ClickStyle="Sink" FontFamily="Microsoft Yahei" Background="White"  Foreground="Black"
+                    pu:ButtonHelper.HoverBrush="#FF8900" pu:ButtonHelper.CornerRadius="7" Canvas.Left="55" Canvas.Top="326" Click="Left_Click" />
+                <Button  Height="31" Width="70" Content="确认切换" pu:ButtonHelper.ClickStyle="Sink" FontFamily="Microsoft Yahei" Background="White"  Foreground="Black"
+                    pu:ButtonHelper.HoverBrush="#FF8900" pu:ButtonHelper.CornerRadius="7" Canvas.Left="234" Canvas.Top="326" Click="Change_Click" />
             </Canvas>
         </Viewbox>
     </Grid>

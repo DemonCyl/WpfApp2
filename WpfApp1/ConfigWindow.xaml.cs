@@ -27,6 +27,8 @@ namespace WpfApp1
     {
         private ProductConfig info;
         private List<ProductConfig> list;
+        private ProductConfig leftPro;
+        private ProductConfig rightPro;
         private MainDAL dal;
         private ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private int mark = 0;
@@ -294,6 +296,24 @@ namespace WpfApp1
 
         private void Change_Click(object sender, RoutedEventArgs e)
         {
+            if (leftPro == null)
+            {
+                Info.Text = "请选择左侧产品！";
+                return;
+            }
+            if (rightPro == null)
+            {
+                Info.Text = "请选择右侧产品！";
+                return;
+            }
+
+            productHandler(this, leftPro, rightPro);
+
+            this.Close();
+        }
+
+        private void Left_Click(object sender, RoutedEventArgs e)
+        {
             if (!ZCItems.HasItems)
             {
                 Info.Text = "请选择要切换的产品！";
@@ -301,12 +321,23 @@ namespace WpfApp1
             }
 
             var item = ZCItems.SelectedItem.ToString();
-            var pro = list.Find(f => f.FZCType == item);
+            leftPro = list.Find(f => f.FZCType == item);
 
-            productHandler(this, pro, pro);
-
-            //this.Close();
+            Info.Text = "左侧产品确认";
         }
 
+        private void Right_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ZCItems.HasItems)
+            {
+                Info.Text = "请选择要切换的产品！";
+                return;
+            }
+
+            var item = ZCItems.SelectedItem.ToString();
+            rightPro = list.Find(f => f.FZCType == item);
+
+            Info.Text = "右侧产品确认";
+        }
     }
 }

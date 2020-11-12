@@ -301,7 +301,8 @@
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="81" Canvas.Left="426" Canvas.Top="348"/>
                 <TextBlock x:Name="ZongType_Right" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="201" Canvas.Left="17" Canvas.Top="368"/>
-
+                <TextBlock x:Name="IsOnline" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="13" Width="28" Canvas.Left="812"/>
                 <!--<ListView x:Name="listView_Copy" ItemsSource="{Binding .}" Canvas.Top="64" Height="264" Width="40" Background="#EE3BABFF" FontFamily="Microsoft Yahei" Canvas.Left="10" Foreground="White" >
                     <ListView.Resources>
                         <Style TargetType="{x:Type GridViewColumnHeader}" >
