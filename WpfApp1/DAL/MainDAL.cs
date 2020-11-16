@@ -33,6 +33,39 @@ namespace WpfApp1.DAL
             }
         }
 
+        public long QueryBefore(string gwItem, string barCode)
+        {
+            string sql = $"select t.FInterID from ProcessInfo t left join ProcessInfoEntry1 t1 on t.FInterID = t1.FProcessInfoID where t.FProcess = '{gwItem}' and t1.FBarCode = '{barCode}'";
+
+            using (var conn = new DbHelperSQL(config).GetConnection())
+            {
+                var re = conn.QueryFirstOrDefault<long>(sql);
+                return re;
+            }
+        }
+
+        public long QueryBeforeLR(string gwItem, string barCode, int xinghao)
+        {
+            string sql = $"select t.FInterID from ProcessInfo t left join ProcessInfoEntry1 t1 on t.FInterID = t1.FProcessInfoID left join ProductConfig p on t.FProductID = p.FInterID where t.FProcess = '{gwItem}' and t1.FBarCode = '{barCode}' and p.FXingHao = {xinghao}";
+
+            using (var conn = new DbHelperSQL(config).GetConnection())
+            {
+                var re = conn.QueryFirstOrDefault<long>(sql);
+                return re;
+            }
+        }
+
+        public List<string> GetBarCodeList(long fid)
+        {
+            string sql = $"select FBarCode from ProcessInfoEntry1 where FProcessInfoID = {fid} ";
+
+            using (var conn = new DbHelperSQL(config).GetConnection())
+            {
+                var re = conn.Query<string>(sql).ToList();
+                return re;
+            }
+        }
+
         public bool SaveItem(ProductConfig info)
         {
             string sql = @" INSERT INTO ProductConfig (FZCType,FXingHao,FCodeRule,FCodeRule1,FStatus1,FCodeRule2,FStatus2,FCodeRule3,FStatus3,FCodeSum,FGWItem,FDate) VALUES
