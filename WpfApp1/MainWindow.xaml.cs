@@ -40,12 +40,15 @@ namespace WpfApp1
         private GetInfoService service = new GetInfoService();
         private DispatcherTimer ShowTimer;
         private DispatcherTimer timer;
+        private List<ProductConfig> Gwlist;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
         private ConfigData config;
         private BarCodeStr codeStr;
         private ProductConfig product;
         private ProductConfig rightproduct;
         private SerialPort serialPort;
+        private SerialPort serialPortLeft;
+        private SerialPort serialPortRight;
         //private Plc plc;
         private SiemensS7Net splc;
         private OperateResult connect;
@@ -75,6 +78,7 @@ namespace WpfApp1
         private MainDAL dal;
         private bool leftMark = false;
         private bool rightMark = false;
+        private Thread thread;
 
         public MainWindow()
         {
@@ -94,6 +98,8 @@ namespace WpfApp1
                 //读取本地配置JSON文件
                 LoadJsonData();
                 Init();
+
+
                 //MainPageLoad();
                 //plc = new Plc(CpuType.S71200, config.IpAdress, 0, 1);
                 splc = new SiemensS7Net(SiemensPLCS.S1200, config.IpAdress)
@@ -113,13 +119,14 @@ namespace WpfApp1
 
                 connect = splc.ConnectServer();
 
-                #region PLC连接定时器
-                //timer = new System.Windows.Threading.DispatcherTimer();
-                //timer.Tick += new EventHandler(ThreadCheck);
-                //timer.Interval = new TimeSpan(0, 0, 0, 15);
-                //timer.Start();
-                #endregion
+                InitGw();
 
+                #region PLC连接定时器
+                timer = new System.Windows.Threading.DispatcherTimer();
+                timer.Tick += new EventHandler(ThreadCheck);
+                timer.Interval = new TimeSpan(0, 0, 0, 5);
+                timer.Start();
+                #endregion
 
                 ListViewAutomationPeer lvapl = new ListViewAutomationPeer(listViewL);
                 double rowMarkl = -1;
@@ -160,27 +167,7 @@ namespace WpfApp1
                 };
                 listTimerr.Interval = new TimeSpan(0, 0, 0, 5);
                 listTimerr.Start();
-                //if (plc.IsAvailable)
-                //{
 
-                //    var result = plc.Open();
-                //    if (!plc.IsConnected)
-                //    {
-                //        PLCImage.Source = IFalse;
-                //        log.Info("PLC Not Connected!");
-                //    }
-                //    else
-                //    {
-                //        PLCImage.Source = ITrue;
-                //        log.Info("PLC Connected!");
-                //        DataReload();
-                //    }
-                //}
-                //else
-                //{
-                //    PLCImage.Source = IFalse;
-                //    log.Info("PLC Not Connected!");
-                //}
             }
             catch (Exception e)
             {
@@ -210,6 +197,7 @@ namespace WpfApp1
             pImage.Source = new BitmapImage(new Uri(config.ImageUri, UriKind.Absolute)); ;
             Logo.Source = ILogo;
 
+            dal = new MainDAL(config);
         }
 
         private void MainPageLoad()
@@ -242,12 +230,41 @@ namespace WpfApp1
                 try
                 {
                     //读取在线 离线
-                    var IsOnMark = splc.ReadBool("DB25.182.6");
+                    string stron = "";
+                    switch (config.GWNo)
+                    {
+                        case 04051:
+                            stron = "DB19.4.0";
+                            break;
+                        case 04062:
+                            stron = "DB25.182.6";
+                            break;
+                    }
+                    var IsOnMark = splc.ReadBool(stron);
                     if (IsOnMark.IsSuccess)
                     {
                         IsOn = IsOnMark.Content;
                     }
                     IsOnline.Text = IsOn ? "在线" : "离线";
+                    // 开始访问扫描枪
+                    if (IsOn)
+                    {
+                        if (config.GWNo == 04062)
+                        {
+
+                            this.PortConnection();
+                        }
+                        else if (config.GWNo == 04051)
+                        {
+                            this.PortConnectionLeft();
+                            this.PortConnectionRight();
+                        }
+                    }
+                    else
+                    {
+                        this.PortClose();
+                        this.PortClose2();
+                    }
 
                     //读取PLC工序步骤状态
                     //左
@@ -258,7 +275,7 @@ namespace WpfApp1
                     {
                         ModifyStep1(sta.Content, config.GWNo, 0);
 
-                        leftMark = (sta.Content == 110);
+                        //leftMark = (sta.Content == 110);
                     }
                     else
                     {
@@ -272,22 +289,14 @@ namespace WpfApp1
                     {
                         ModifyStep1(sta1.Content, config.GWNo, 1);
 
-                        rightMark = (sta.Content == 110);
+                        //rightMark = (sta.Content == 110);
                     }
                     else
                     {
                         throw new Exception("工序步骤状态读取失败");
                     }
 
-                    // 开始访问扫描枪
-                    if (leftMark || rightMark)
-                    {
-                        this.PortConnection();
-                    }
-                    else
-                    {
-                        this.PortClose();
-                    }
+
 
 
                     #region 型号获取
@@ -637,6 +646,7 @@ namespace WpfApp1
                         {
                             if (!saveMark)
                             {
+                                //log.Debug(service.GetReadSaveStr(config.GWNo, 0));
                                 bool save = false;
                                 string process = "";
                                 switch (config.GWNo)
@@ -644,6 +654,7 @@ namespace WpfApp1
                                     case 04051:
                                         process = "上部框架预装";
                                         save = dal.SaveInfo(product.FInterID, process, barList, null);
+                                        //log.Debug(save);
                                         break;
                                     case 04062:
                                         process = "H型滑轨装配";
@@ -654,6 +665,9 @@ namespace WpfApp1
                                 {
                                     splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
                                     saveMark = true;
+                                    barList.Clear();
+                                    barCount = 0;
+                                    elist.Clear();
                                 }
                             }
                         }
@@ -670,6 +684,7 @@ namespace WpfApp1
                         {
                             if (!saveMark1)
                             {
+                                //log.Debug(service.GetReadSaveStr(config.GWNo, 1));
                                 bool save = false;
                                 string process = "";
                                 switch (config.GWNo)
@@ -677,6 +692,7 @@ namespace WpfApp1
                                     case 04051:
                                         process = "前管装配";
                                         save = dal.SaveInfo(product.FInterID, process, rightbarList, ReList);
+                                        //log.Debug(save);
                                         break;
                                     case 04062:
                                         process = "H型滑轨装配";
@@ -687,6 +703,9 @@ namespace WpfApp1
                                 {
                                     splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
                                     saveMark1 = true;
+                                    rightbarList.Clear();
+                                    rightbarCount = 0;
+                                    rightelist.Clear();
                                 }
                             }
                         }
@@ -697,19 +716,6 @@ namespace WpfApp1
                     }
 
 
-                    //报警信息
-                    var infol = splc.ReadUInt16(service.GetErrorStr(config.Station1No));
-                    if (infol.IsSuccess)
-                    {
-                        var mesl = config.InfoData1.Find(f => f.Type == infol.Content);
-                        ErrorInfoLeft.Text = mesl == null ? "" : mesl.ErrorInfo;
-                    }
-                    var infor = splc.ReadUInt16(service.GetErrorStr(config.Station2No));
-                    if (infor.IsSuccess)
-                    {
-                        var mesr = config.InfoData2.Find(f => f.Type == infor.Content);
-                        ErrorInfoRight.Text = mesr == null ? "" : mesr.ErrorInfo;
-                    }
 
                     remark = true;
                 }
@@ -954,18 +960,29 @@ namespace WpfApp1
                         {
                             left.ForEach(f =>
                             {
-                                f.Status = IFalse;
+                                f.Status = (f.sType == type ? ITrue : IFalse);
                             });
                             Barcode1.Text = "";
                             Barcode2.Text = "";
                             Barcode3.Text = "";
                             Barcode4.Text = "";
+                            BarYz.Text = "";
+                            barList.Clear();
+                            barCount = 0;
+                            rightbarList.Clear();
+                            rightbarCount = 0;
+                            elist.Clear();
+                            rightelist.Clear();
                         }
                         else if (type == 100 || type == 110)
                         {
                             left.ForEach(f =>
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
+                                if (f.sType == 0)
+                                    f.Status = ITrue;
+                                if (f.sType == 100)
+                                    f.Status = ITrue;
                             });
                         }
                         else
@@ -1033,18 +1050,29 @@ namespace WpfApp1
                         {
                             left.ForEach(f =>
                             {
-                                f.Status = IFalse;
+                                f.Status = (f.sType == type ? ITrue : IFalse);
                             });
                             Barcode1.Text = "";
                             Barcode2.Text = "";
                             Barcode3.Text = "";
                             Barcode4.Text = "";
+                            BarYz.Text = "";
+                            barList.Clear();
+                            barCount = 0;
+                            rightbarList.Clear();
+                            rightbarCount = 0;
+                            elist.Clear();
+                            rightelist.Clear();
                         }
                         else if (type == 100 || type == 110)
                         {
                             left.ForEach(f =>
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
+                                if (f.sType == 0)
+                                    f.Status = ITrue;
+                                if (f.sType == 100)
+                                    f.Status = ITrue;
                             });
                         }
                         else
@@ -1097,18 +1125,29 @@ namespace WpfApp1
                         {
                             right.ForEach(f =>
                             {
-                                f.Status = IFalse;
+                                f.Status = (f.sType == type ? ITrue : IFalse);
                             });
                             Barcode1.Text = "";
                             Barcode2.Text = "";
                             Barcode3.Text = "";
                             Barcode4.Text = "";
+                            BarYz.Text = "";
+                            barList.Clear();
+                            barCount = 0;
+                            rightbarList.Clear();
+                            rightbarCount = 0;
+                            elist.Clear();
+                            rightelist.Clear();
                         }
                         else if (type == 100 || type == 110)
                         {
                             right.ForEach(f =>
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
+                                if (f.sType == 0)
+                                    f.Status = ITrue;
+                                if (f.sType == 100)
+                                    f.Status = ITrue;
                             });
                         }
                         else
@@ -1176,18 +1215,29 @@ namespace WpfApp1
                         {
                             right.ForEach(f =>
                             {
-                                f.Status = IFalse;
+                                f.Status = (f.sType == type ? ITrue : IFalse);
                             });
                             Barcode1.Text = "";
                             Barcode2.Text = "";
                             Barcode3.Text = "";
                             Barcode4.Text = "";
+                            BarYz.Text = "";
+                            barList.Clear();
+                            barCount = 0;
+                            rightbarList.Clear();
+                            rightbarCount = 0;
+                            elist.Clear();
+                            rightelist.Clear();
                         }
                         else if (type == 100 || type == 110)
                         {
                             right.ForEach(f =>
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
+                                if (f.sType == 0)
+                                    f.Status = ITrue;
+                                if (f.sType == 100)
+                                    f.Status = ITrue;
                             });
                         }
                         else
@@ -1276,6 +1326,54 @@ namespace WpfApp1
             log.Info("PLC Disconnected!");
         }
 
+        private void ReadErrorInfo()
+        {
+            while (true)
+            {
+                Thread.Sleep(500);
+                bool errMark = false;
+                foreach (var err in config.InfoDatas)
+                {
+                    var e1 = splc.ReadBool(err.Address);
+                    if (e1.IsSuccess && e1.Content)
+                    {
+                        errMark = true;
+                        Dispatcher.InvokeAsync(() =>
+                        {
+                            ErrorInfo.Text = err.ErrorInfo;
+                        });
+                        break;
+                    }
+                    //else
+                    //{
+                    //    Dispatcher.InvokeAsync(() =>
+                    //    {
+                    //        ErrorInfo.Text = "";
+                    //    });
+                    //}
+                }
+                if (!errMark)
+                {
+                    Dispatcher.InvokeAsync(() =>
+                    {
+                        ErrorInfo.Text = "";
+                    });
+                }
+                //foreach (var err in config.InfoDataRight)
+                //{
+                //    var e1 = splc.ReadBool(err.Address);
+                //    if (e1.IsSuccess && e1.Content)
+                //    {
+                //        Dispatcher.InvokeAsync(() =>
+                //        {
+                //            ErrorInfoRight.Text = err.ErrorInfo;
+                //        });
+                //        break;
+                //    }
+                //}
+            }
+        }
+
         public void ThreadCheck(object sender, EventArgs e)
         {
             var check = splc.ReadUInt16("DB2000.0");
@@ -1287,6 +1385,13 @@ namespace WpfApp1
                 if (!remark)
                 {
                     DataReload();
+                    //起个thread 报警信息
+                    if (thread == null || !thread.IsAlive)
+                    {
+                        thread = new Thread(new ThreadStart(ReadErrorInfo));
+                        thread.IsBackground = true;
+                        thread.Start();
+                    }
                 }
             }
             else
@@ -1306,7 +1411,41 @@ namespace WpfApp1
             w.Activate();
         }
 
-        private void ChildWin_Form(object sender, ProductConfig pro, ProductConfig proRight)
+        private void InitGw()
+        {
+            Gwlist = dal.QueryItem();
+            string process = "";
+            string processRight = "";
+            int xh = 0;
+            int xh1 = 0;
+            switch (config.GWNo)
+            {
+                case 04051:
+                    process = "上部框架预装";
+                    processRight = "前管装配";
+                    xh = 1;
+                    xh1 = 1;
+                    break;
+                case 04062:
+                    ChangeMenuItem.Visibility = Visibility.Hidden;
+                    process = "H型滑轨装配";
+                    processRight = "H型滑轨装配";
+                    xh = 1;
+                    xh1 = 2;
+                    break;
+
+            }
+            ProductConfig productConfig = Gwlist.Find(f => f.FGWItem.Equals(process) && f.FXingHao == xh);
+            ProductConfig productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == xh1);
+
+            if (productConfig != null && productConfig1 != null)
+            {
+                Start(productConfig, productConfig1);
+            }
+
+        }
+
+        private void Start(ProductConfig pro, ProductConfig proRight)
         {
             yzList.Clear();
             rightyzList.Clear();
@@ -1374,23 +1513,27 @@ namespace WpfApp1
             remark = false;
 
             // write plc data
-            string addressleft = null;
-            string addressright = null;
+            string addressleft = "";
+            string addressright = "";
             switch (config.GWNo)
             {
                 case 04051:
+                    addressleft = "DB2000.4270";
+                    addressright = "DB2000.4270";
                     break;
                 case 04062:
+                    addressleft = "DB2000.4272";
+                    addressright = "DB2000.4274";
                     break;
             }
-            //splc.Write(address, pro.FPLC);
+            splc.Write(addressleft, (short)pro.FXingHao);
+            splc.Write(addressright, (short)proRight.FXingHao);
 
-            #region PLC连接定时器
-            timer = new System.Windows.Threading.DispatcherTimer();
-            timer.Tick += new EventHandler(ThreadCheck);
-            timer.Interval = new TimeSpan(0, 0, 0, 5);
-            timer.Start();
-            #endregion
+        }
+
+        private void ChildWin_Form(object sender, ProductConfig pro, ProductConfig proRight)
+        {
+            Start(pro, proRight);
         }
 
         private bool PortConnection()
@@ -1398,10 +1541,6 @@ namespace WpfApp1
             bool mark = false;
             if (serialPort == null)
             {
-                barList.Clear();
-                rightbarList.Clear();
-                rightbarCount = 0;
-                barCount = 0;
                 serialPort = new SerialPort(config.PortName, config.BaudRate, Parity.None, 8, StopBits.One);
                 serialPort.DtrEnable = true;
                 serialPort.RtsEnable = true;
@@ -1411,6 +1550,38 @@ namespace WpfApp1
             }
             return mark;
         }
+
+        private bool PortConnectionLeft()
+        {
+            bool mark = false;
+            if (serialPortLeft == null)
+            {
+                serialPortLeft = new SerialPort(config.PortName, config.BaudRate, Parity.None, 8, StopBits.One);
+                serialPortLeft.DtrEnable = true;
+                serialPortLeft.RtsEnable = true;
+                serialPortLeft.ReadTimeout = 100;
+                serialPortLeft.DataReceived += serialPort_DataReceivedLeft;
+                mark = OpenPortLeft();
+            }
+            return mark;
+        }
+
+        private bool PortConnectionRight()
+        {
+            bool mark = false;
+            if (serialPortRight == null)
+            {
+                serialPortRight = new SerialPort(config.PortName1, config.BaudRate1, Parity.None, 8, StopBits.One);
+                serialPortRight.DtrEnable = true;
+                serialPortRight.RtsEnable = true;
+                serialPortRight.ReadTimeout = 100;
+                serialPortRight.DataReceived += serialPort_DataReceivedRight;
+                mark = OpenPortRight();
+            }
+            return mark;
+        }
+
+
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
@@ -1453,12 +1624,145 @@ namespace WpfApp1
             }
         }
 
-        private void BarCodeMatch(string barcode)
+        private void serialPort_DataReceivedRight(object sender, SerialDataReceivedEventArgs e)
         {
+            try
+            {
+                var serialPort = (SerialPort)sender;
+                //开启接收数据线程
+                Thread threadReceiveSub = new Thread(new ParameterizedThreadStart(ReceiveDataRight));
+                threadReceiveSub.Start(serialPort);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void ReceiveDataRight(object serialPortobj)
+        {
+            try
+            {
+                SerialPort serialPort = (SerialPort)serialPortobj;
+
+                //防止数据接收不完整 线程sleep(100)
+                Thread.Sleep(100);
+
+                string str = serialPort.ReadExisting();
+
+                if (str == string.Empty)
+                {
+                    return;
+                }
+                else
+                {
+                    BarCodeMatchRight(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void serialPort_DataReceivedLeft(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+                var serialPort = (SerialPort)sender;
+                //开启接收数据线程
+                Thread threadReceiveSub = new Thread(new ParameterizedThreadStart(ReceiveDataLeft));
+                threadReceiveSub.Start(serialPort);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void ReceiveDataLeft(object serialPortobj)
+        {
+            try
+            {
+                SerialPort serialPort = (SerialPort)serialPortobj;
+
+                //防止数据接收不完整 线程sleep(100)
+                Thread.Sleep(100);
+
+                string str = serialPort.ReadExisting();
+
+                if (str == string.Empty)
+                {
+                    return;
+                }
+                else
+                {
+                    BarCodeMatchLeft(str);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex.Message);
+            }
+        }
+
+        private void BarCodeMatchLeft(string barcode)
+        {
+            bool barmark = false;
             // 防错
             var fc = yzList.Find(f => barcode.Contains(f));
             if (fc != null)
             {
+                barmark = true;
+                if (elist.FindIndex(f => f.Equals(fc)) != -1)
+                {
+                    barList.Remove(barList.Find(bar => bar.Contains(fc)));
+
+                    barList.Add(barcode);
+                }
+                else
+                {
+                    elist.Add(fc);
+                    barList.Add(barcode);
+                    barCount += 1;
+                }
+            }
+
+            //上工序 判断
+            //var ss = dal.QueryRecor("前管装配",barcode); //找出是否存在barcode
+            
+
+            if (barCount == product.FCodeSum)
+            {
+                // write plc ???
+                splc.Write(service.GetSaoMaStr(config.GWNo, 0), 2);
+            }
+
+
+            Dispatcher.InvokeAsync(() =>
+            {
+                switch (barCount % 2)
+                {
+                    case 0:
+                        Barcode2.Text = barcode;
+                        break;
+                    case 1:
+                        Barcode1.Text = barcode;
+                        break;
+                }
+                BarYz.Text = fc != null ? "OK" : "NG";
+
+            });
+        }
+
+        private void BarCodeMatch(string barcode)
+        {
+            bool barmark = false;
+            // 防错
+            var fc = yzList.Find(f => barcode.Contains(f));
+            if (fc != null)
+            {
+                barmark = true;
                 if (elist.FindIndex(f => f.Equals(fc)) != -1)
                 {
                     barList.Remove(barList.Find(bar => bar.Contains(fc)));
@@ -1475,6 +1779,7 @@ namespace WpfApp1
             var fcr = rightyzList.Find(f => barcode.Contains(f));
             if (fcr != null)
             {
+                barmark = false;
                 if (rightelist.FindIndex(f => f.Equals(fcr)) != -1)
                 {
                     rightbarList.Remove(rightbarList.Find(bar => bar.Contains(fcr)));
@@ -1504,10 +1809,89 @@ namespace WpfApp1
 
             Dispatcher.InvokeAsync(() =>
             {
-                Barcode1.Text = barcode;
+                if (barmark)
+                {
 
-                BarYz.Text = fc != null ? "OK" : "NG";
+                    switch (barCount % 2)
+                    {
+                        case 0:
+                            Barcode2.Text = barcode;
+                            break;
+                        case 1:
+                            Barcode1.Text = barcode;
+                            break;
+                    }
 
+                }
+                else
+                {
+
+                    switch (rightbarCount % 2)
+                    {
+                        case 0:
+                            Barcode4.Text = barcode;
+                            break;
+                        case 1:
+                            Barcode3.Text = barcode;
+                            break;
+                    }
+                }
+
+                if (fc == null && fcr == null)
+                {
+                    BarYz.Text = "NG";
+                }
+                else
+                {
+                    BarYz.Text = "OK";
+                }
+
+            });
+        }
+
+        private void BarCodeMatchRight(string barcode)
+        {
+            bool barmark = false;
+            // 防错
+            var fcr = rightyzList.Find(f => barcode.Contains(f));
+            if (fcr != null)
+            {
+                barmark = false;
+                if (rightelist.FindIndex(f => f.Equals(fcr)) != -1)
+                {
+                    rightbarList.Remove(rightbarList.Find(bar => bar.Contains(fcr)));
+
+                    rightbarList.Add(barcode);
+                }
+                else
+                {
+                    rightelist.Add(fcr);
+                    rightbarList.Add(barcode);
+                    rightbarCount += 1;
+                }
+            }
+
+            //上工序 ??
+
+            if (rightbarCount == rightproduct.FCodeSum)
+            {
+                // write plc ???
+                splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
+            }
+
+            Dispatcher.InvokeAsync(() =>
+            {
+
+                switch (rightbarCount % 2)
+                {
+                    case 0:
+                        Barcode4.Text = barcode;
+                        break;
+                    case 1:
+                        Barcode3.Text = barcode;
+                        break;
+                }
+                BarYz_Copy.Text = fcr != null ? "OK" : "NG";
             });
         }
 
@@ -1534,11 +1918,100 @@ namespace WpfApp1
             }
         }
 
+        private bool OpenPortLeft()
+        {
+            string message = null;
+            try//这里写成异常处理的形式以免串口打不开程序崩溃
+            {
+                serialPortLeft.Open();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+            if (serialPortLeft.IsOpen)
+            {
+                log.Info("连接成功！");
+                return true;
+            }
+            else
+            {
+                log.Error("打开失败!原因为： " + message);
+                return false;
+            }
+        }
+
+        private bool OpenPortRight()
+        {
+            string message = null;
+            try//这里写成异常处理的形式以免串口打不开程序崩溃
+            {
+                serialPortRight.Open();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+            }
+            if (serialPortRight.IsOpen)
+            {
+                log.Info("连接成功！");
+                return true;
+            }
+            else
+            {
+                log.Error("打开失败!原因为： " + message);
+                return false;
+            }
+        }
+
         private void PortClose()
         {
             if (serialPort != null && serialPort.IsOpen)
             {
                 serialPort.Close();
+                serialPort = null;
+            }
+        }
+
+        private void PortClose2()
+        {
+            if (serialPortLeft != null && serialPortLeft.IsOpen)
+            {
+                serialPortLeft.Close();
+                serialPortLeft = null;
+            }
+            if (serialPortRight != null && serialPortRight.IsOpen)
+            {
+                serialPortRight.Close();
+                serialPortRight = null;
+            }
+        }
+
+        private void Change_Click(object sender, RoutedEventArgs e)
+        {
+            if (config.GWNo == 04051)
+            {
+                string process = "上部框架预装";
+                string processRight = "前管装配";
+                int value = 0;
+
+                switch (product.FXingHao)
+                {
+                    case 1:
+                        value = 2;
+                        break;
+                    case 2:
+                        value = 1;
+                        break;
+                }
+
+                ProductConfig productConfig = Gwlist.Find(f => f.FGWItem.Equals(process) && f.FXingHao == value);
+                ProductConfig productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == value);
+
+                if (productConfig != null && productConfig1 != null)
+                {
+                    Start(productConfig, productConfig1);
+                }
             }
         }
     }

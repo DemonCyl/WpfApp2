@@ -24,6 +24,7 @@ namespace WpfApp1.Entity
         public string FCodeRule3 { get; set; }
         public int FStatus3 { get; set; }
         public int FCodeSum { get; set; }
+        public string FGWItem { get; set; }
         public DateTime FDate { get; set; }
     }
 }

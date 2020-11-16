@@ -237,11 +237,11 @@ namespace WpfApp1.Services
                 case 04051:
                     if (type == 0) //left
                     {
-                        conn = "";
+                        conn = "DB4000.510";
                     }
                     else if (type == 1) //right
                     {
-                        conn = "DB4000.510";
+                        conn = "DB4000.126";
                     }
                     break;
                 case 04062:
@@ -266,21 +266,21 @@ namespace WpfApp1.Services
                 case 04051:
                     if (type == 0) //left
                     {
-                        conn = "DB4000.509";
+                        conn = "DB4000.1334.2";
                     }
                     else if (type == 1) //right
                     {
-                        conn = "DB4000.125";
+                        conn = "DB4000.1334.0";
                     }
                     break;
                 case 04062:
                     if (type == 0) //left
                     {
-                        conn = "DB4000.1420";
+                        conn = "DB4000.1766.0";
                     }
                     else if (type == 1) //right
                     {
-                        conn = "DB4000.1421";
+                        conn = "DB4000.1766.2";
                     }
                     break;
             }
@@ -295,21 +295,21 @@ namespace WpfApp1.Services
                 case 04051:
                     if (type == 0) //left
                     {
-                        conn = "DB4000.511";
+                        conn = "DB4000.1334.3";
                     }
                     else if (type == 1) //right
                     {
-                        conn = "DB4000.127";
+                        conn = "DB4000.1334.1";
                     }
                     break;
                 case 04062:
                     if (type == 0) //left
                     {
-                        conn = "DB4000.1420";
+                        conn = "DB4000.1766.1";
                     }
                     else if (type == 1) //right
                     {
-                        conn = "DB4000.1421";
+                        conn = "DB4000.1766.3";
                     }
                     break;
             }

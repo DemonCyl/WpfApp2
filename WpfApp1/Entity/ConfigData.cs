@@ -22,6 +22,9 @@ namespace WpfApp1.Entity
         #region 接收器配置
         public string PortName { get; set; }
         public int BaudRate { get; set; }
+
+        public string PortName1 { get; set; }
+        public int BaudRate1 { get; set; }
         #endregion
 
         public string IpAdress { get; set; }
@@ -65,7 +68,7 @@ namespace WpfApp1.Entity
 
         public ushort BarLengh { get; set; }
 
-        public List<InfoData> InfoData1 { get; set; }
-        public List<InfoData> InfoData2 { get; set; }
+        public List<InfoData> InfoDatas { get; set; }
+        //public List<InfoData> InfoDataRight { get; set; }
     }
 }

@@ -14,6 +14,7 @@
             <Canvas x:Name="Canvas1" Width="840" Height=" 470">
                 <Menu x:Name="menu" Height="16" VerticalAlignment="Top" HorizontalAlignment="Left" Background="SteelBlue" BorderThickness="0">
                     <MenuItem Header="配置" FontSize="12" Foreground="#F0E68C" FontFamily="Microsoft Yahei" Click="Config_Click"/>
+                    <MenuItem x:Name="ChangeMenuItem" Header="切换产品" FontSize="12" Foreground="#F0E68C" FontFamily="Microsoft Yahei" Click="Change_Click"/>
                 </Menu>
                 <Canvas x:Name="imageCanvas" Width="505" Height="256"  Canvas.Left="335" Canvas.Top="72">
                     <Image x:Name="pImage" Width="505" Height="256" Stretch="Fill"></Image>
@@ -225,7 +226,7 @@
                 <TextBlock x:Name="BarRule" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="81" Canvas.Left="340" Canvas.Top="348"/>
                 <TextBlock x:Name="BarYz" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
-                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="15" Width="47" Canvas.Left="392" Canvas.Top="416"/>
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="15" Width="40" Canvas.Left="392" Canvas.Top="416"/>
                 <TextBlock x:Name="Step1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="31" Width="113" Canvas.Left="47" Canvas.Top="64"/>
 
@@ -291,18 +292,17 @@
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="45" Canvas.Left="85" Canvas.Top="400"/>
                 <Label Canvas.Top="376" Content="左:" FontSize="10" FontFamily="Microsoft Yahei" Foreground="#F0E68C" Canvas.Left="60" Width="21"/>
                 <Label Canvas.Top="395" Content="右:" FontSize="10" FontFamily="Microsoft Yahei" Foreground="#F0E68C" Canvas.Left="60" Width="21"/>
-                <Label FontSize="12" Foreground="#F0E68C" Content="报警(左):" FontFamily="Microsoft Yahei" Canvas.Left="10" Canvas.Top="441"/>
-                <TextBlock x:Name="ErrorInfoLeft" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="12"
-                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="18" Width="340" Canvas.Left="78" Canvas.Top="444"/>
-                <Label FontSize="12" Foreground="#F0E68C" Content="报警(右):" FontFamily="Microsoft Yahei" Canvas.Left="436" Canvas.Top="441"/>
-                <TextBlock x:Name="ErrorInfoRight" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="12"
-                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="18" Width="326" Canvas.Left="504" Canvas.Top="444"/>
+                <Label FontSize="12" Foreground="#F0E68C" Content="报警:" FontFamily="Microsoft Yahei" Canvas.Left="10" Canvas.Top="441"/>
+                <TextBlock x:Name="ErrorInfo" HorizontalAlignment="Left" Foreground="Red" FontFamily="Microsoft Yahei" FontSize="12"
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="18" Width="752" Canvas.Left="78" Canvas.Top="444"/>
                 <TextBlock x:Name="BarRule_Right" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="65" Width="81" Canvas.Left="426" Canvas.Top="348"/>
                 <TextBlock x:Name="ZongType_Right" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="201" Canvas.Left="17" Canvas.Top="368"/>
                 <TextBlock x:Name="IsOnline" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Center" Height="13" Width="28" Canvas.Left="812"/>
+                <TextBlock x:Name="BarYz_Copy" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="15" Width="40" Canvas.Left="457" Canvas.Top="416"/>
                 <!--<ListView x:Name="listView_Copy" ItemsSource="{Binding .}" Canvas.Top="64" Height="264" Width="40" Background="#EE3BABFF" FontFamily="Microsoft Yahei" Canvas.Left="10" Foreground="White" >
                     <ListView.Resources>
                         <Style TargetType="{x:Type GridViewColumnHeader}" >
