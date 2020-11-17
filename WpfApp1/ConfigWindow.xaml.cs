@@ -26,7 +26,7 @@ namespace WpfApp1
     public partial class ConfigWindow : Window
     {
         private ProductConfig info;
-        private List<ProductConfig> list;
+        private List<ProductConfig> list = new List<ProductConfig>();
         private ProductConfig leftPro;
         private ProductConfig rightPro;
         private MainDAL dal;
@@ -175,15 +175,18 @@ namespace WpfApp1
             try
             {
                 list = dal.QueryItem();
-                var itemlist = new List<string>();
-                list.ForEach(f =>
+                if (list.Any())
                 {
-                    itemlist.Add(f.FZCType);
-                });
-                ZCItems.ItemsSource = itemlist;
-                ZCItems.SelectedIndex = 0;
+                    var itemlist = new List<string>();
+                    list.ForEach(f =>
+                    {
+                        itemlist.Add(f.FZCType);
+                    });
+                    ZCItems.ItemsSource = itemlist;
+                    ZCItems.SelectedIndex = 0;
 
-                mark = 2;
+                    mark = 2;
+                }
             }
             catch (Exception ex)
             {
