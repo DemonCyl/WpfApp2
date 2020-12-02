@@ -56,6 +56,8 @@ namespace WpfApp1
         private int markN = 0;
         private int barCount = 0;
         private int rightbarCount = 0;
+        private int barCount1 = 0;
+        private int rightbarCount1 = 0;
         private List<GDbData> ReList = new List<GDbData>();
         private List<GDbData> rightReList = new List<GDbData>();
         private bool remark = false;
@@ -80,6 +82,8 @@ namespace WpfApp1
         private MainDAL dal;
         private bool leftMark = false;
         private bool rightMark = false;
+        private bool leftMark1 = false;
+        private bool rightMark1 = false;
         private Thread thread;
 
         public MainWindow()
@@ -500,7 +504,8 @@ namespace WpfApp1
                     #region 拧紧枪数据获取
                     ReList.Clear();
                     rightReList.Clear();
-
+                    DataList.ItemsSource = null;
+                    DataList.Items.Refresh();
                     if (config.GunCount > 0)
                     {
                         for (int i = 1; i <= config.GunCount; i++)
@@ -515,8 +520,8 @@ namespace WpfApp1
                             double torque1 = 0;
                             double angle1 = 0;
                             bool result1 = false;
-                            var t = splc.ReadDouble(GunStr.TorqueStr);
-                            var a = splc.ReadDouble(GunStr.AngleStr);
+                            var t = splc.ReadFloat(GunStr.TorqueStr);
+                            var a = splc.ReadFloat(GunStr.AngleStr);
                             var r = splc.ReadBool(GunStr.ResultStr);
                             if (t.IsSuccess)
                             {
@@ -583,8 +588,8 @@ namespace WpfApp1
                                 double torque1 = 0;
                                 double angle1 = 0;
                                 bool result1 = false;
-                                var t = splc.ReadDouble(GunStr.TorqueStr);
-                                var a = splc.ReadDouble(GunStr.AngleStr);
+                                var t = splc.ReadFloat(GunStr.TorqueStr);
+                                var a = splc.ReadFloat(GunStr.AngleStr);
                                 var r = splc.ReadBool(GunStr.ResultStr);
                                 if (t.IsSuccess)
                                 {
@@ -616,6 +621,11 @@ namespace WpfApp1
                                 string rest;
                                 if (torque1 != 0)
                                 {
+                                    if (i == 1)
+                                    {
+                                        rightReList.Clear();
+                                        markN = 4;
+                                    }
                                     if (result1)
                                     {
                                         rest = "OK";
@@ -669,6 +679,8 @@ namespace WpfApp1
                                     barCount = 0;
                                     elist.Clear();
                                     leftMark = false;
+                                    leftMark1 = false;
+                                    barCount1 = 0;
                                     beforeLeftList.Clear();
                                 }
                             }
@@ -709,6 +721,8 @@ namespace WpfApp1
                                     rightbarCount = 0;
                                     rightelist.Clear();
                                     rightMark = false;
+                                    rightMark1 = false;
+                                    rightbarCount1 = 0;
                                     beforeRightList.Clear();
                                 }
                             }
@@ -1003,8 +1017,21 @@ namespace WpfApp1
                                 {
                                     f.Status = f.Status == IFalse ? (f.sType == type ? ITrue : IFalse) : ITrue;
                                 }
+
                             });
                         }
+
+                        left.ForEach(f =>
+                        {
+                            if (f.sType <= type)
+                            {
+                                f.Status = ITrue;
+                            }
+                            else
+                            {
+                                f.Status = IFalse;
+                            }
+                        });
                         //switch (type)
                         //{
                         //    case 100:
@@ -1064,8 +1091,21 @@ namespace WpfApp1
                             left.ForEach(f =>
                             {
                                 f.Status = f.Status == IFalse ? (f.sType == type ? ITrue : IFalse) : ITrue;
+
                             });
                         }
+
+                        left.ForEach(f =>
+                        {
+                            if (f.sType <= type)
+                            {
+                                f.Status = ITrue;
+                            }
+                            else
+                            {
+                                f.Status = IFalse;
+                            }
+                        });
                         //switch (type)
                         //{
                         //    case 150:
@@ -1148,8 +1188,21 @@ namespace WpfApp1
                                 {
                                     f.Status = f.Status == IFalse ? (f.sType == type ? ITrue : IFalse) : ITrue;
                                 }
+
                             });
                         }
+
+                        right.ForEach(f =>
+                        {
+                            if (f.sType <= type)
+                            {
+                                f.Status = ITrue;
+                            }
+                            else
+                            {
+                                f.Status = IFalse;
+                            }
+                        });
                         //switch (type)
                         //{
                         //    case 100:
@@ -1220,8 +1273,21 @@ namespace WpfApp1
                                 {
                                     f.Status = f.Status == IFalse ? (f.sType == type ? ITrue : IFalse) : ITrue;
                                 }
+
                             });
                         }
+
+                        right.ForEach(f =>
+                        {
+                            if (f.sType <= type)
+                            {
+                                f.Status = ITrue;
+                            }
+                            else
+                            {
+                                f.Status = IFalse;
+                            }
+                        });
                         //switch (type)
                         //{
                         //    case 100:
@@ -1800,7 +1866,7 @@ namespace WpfApp1
             }
             //上工序 left
             long fid = dal.QueryBeforeLR("滑轨马达组件装配", barcode, product.FXingHao);
-            if (fid > 0 && !leftMark)
+            if (fid > 0 && !leftMark1)
             {
                 var beforeBarList = dal.GetBarCodeList(fid);
                 if (beforeBarList != null && beforeBarList.Any())
@@ -1808,7 +1874,7 @@ namespace WpfApp1
                     //barList.AddRange(beforeBarList);
                     if (!beforeLeftList.Exists(t => t == barcode))
                     {
-                        barCount += 1;
+                        barCount1 += 1;
                     }
                     beforeLeftList = beforeBarList;
                 }
@@ -1823,25 +1889,37 @@ namespace WpfApp1
                     //barList.AddRange(beforeBarList);
                     if (!beforeRightList.Exists(t => t == barcode))
                     {
-                        barCount += 1;
+                        rightbarCount1 += 1;
                     }
                     beforeRightList = beforeBarList;
                 }
             }
 
-            if (barCount == product.FCodeSum && !leftMark)
+            // 左右滑轨
+            if (barCount == product.FCodeSum - 1 && !leftMark)
             {
-                // write plc ???
+                // write plc 
                 splc.Write(service.GetSaoMaStr(config.GWNo, 0), 2);
-                barList.AddRange(beforeLeftList);
                 leftMark = true;
             }
-            if (rightbarCount == rightproduct.FCodeSum && !rightMark)
+            if (rightbarCount == rightproduct.FCodeSum - 1 && !rightMark)
             {
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
-                rightbarList.AddRange(beforeRightList);
                 rightMark = true;
+            }
+            // 水平电机支架总成
+            if (barCount1 == 1 && !leftMark1)
+            {
+                splc.Write("DB4000.1770", 2);
+                barList.AddRange(beforeLeftList);
+                leftMark1 = true;
+            }
+            if (rightbarCount1 == 1 && !rightMark1)
+            {
+                splc.Write("DB4000.1771", 2);
+                rightbarList.AddRange(beforeRightList);
+                rightMark1 = true;
             }
 
             Dispatcher.InvokeAsync(() =>
@@ -2063,6 +2141,7 @@ namespace WpfApp1
             Barcode3.Text = "";
             Barcode4.Text = "";
             BarYz.Text = "";
+            BarYz_Copy.Text = "";
             barList.Clear();
             barCount = 0;
             rightbarList.Clear();
