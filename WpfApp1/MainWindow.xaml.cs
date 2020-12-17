@@ -705,12 +705,12 @@ namespace WpfApp1
                                 {
                                     case 04051:
                                         process = "前管装配";
-                                        save = dal.SaveInfo(product.FInterID, process, rightbarList, ReList);
+                                        save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, ReList);
                                         //log.Debug(save);
                                         break;
                                     case 04062:
                                         process = "H型滑轨装配";
-                                        save = dal.SaveInfo(product.FInterID, process, rightbarList, rightReList);
+                                        save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, rightReList);
                                         break;
                                 }
                                 if (save)
@@ -1032,6 +1032,10 @@ namespace WpfApp1
                                 f.Status = IFalse;
                             }
                         });
+                        if (type == 2100)
+                        {
+                            ClearInfo();
+                        }
                         //switch (type)
                         //{
                         //    case 100:
@@ -1106,6 +1110,10 @@ namespace WpfApp1
                                 f.Status = IFalse;
                             }
                         });
+                        if (type == 900)
+                        {
+                            ClearInfo();
+                        }
                         //switch (type)
                         //{
                         //    case 150:
@@ -1151,7 +1159,7 @@ namespace WpfApp1
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
                             });
-                            ClearInfo();
+                            ClearInforight();
                         }
                         else if (type == 100 || type == 110)
                         {
@@ -1203,6 +1211,10 @@ namespace WpfApp1
                                 f.Status = IFalse;
                             }
                         });
+                        if (type == 2100)
+                        {
+                            ClearInforight();
+                        }
                         //switch (type)
                         //{
                         //    case 100:
@@ -1244,7 +1256,7 @@ namespace WpfApp1
                             {
                                 f.Status = (f.sType == type ? ITrue : IFalse);
                             });
-                            ClearInfo();
+                            ClearInforight();
                         }
                         else if (type == 100 || type == 110)
                         {
@@ -1288,6 +1300,11 @@ namespace WpfApp1
                                 f.Status = IFalse;
                             }
                         });
+
+                        if (type == 1100)
+                        {
+                            ClearInforight();
+                        }
                         //switch (type)
                         //{
                         //    case 100:
@@ -1460,8 +1477,8 @@ namespace WpfApp1
                     ChangeMenuItem.Visibility = Visibility.Hidden;
                     process = "H型滑轨装配";
                     processRight = "H型滑轨装配";
-                    xh = 1;
-                    xh1 = 2;
+                    xh = 2;
+                    xh1 = 1;
                     break;
 
             }
@@ -1502,7 +1519,8 @@ namespace WpfApp1
                     break;
             }
 
-            BarRule.Text = pro.FCodeRule;
+            BarRule.Text = "左侧：";
+            BarRule.Text += "\r\n" + pro.FCodeRule;
             if (pro.FCodeRule != string.Empty)
                 yzList.Add(pro.FCodeRule);
             if (pro.FStatus1 == 1)
@@ -1524,7 +1542,8 @@ namespace WpfApp1
                     yzList.Add(pro.FCodeRule3);
             }
 
-            BarRule_Right.Text = proRight.FCodeRule;
+            BarRule_Right.Text = "右侧：";
+            BarRule_Right.Text += "\r\n" + proRight.FCodeRule;
             if (proRight.FCodeRule != string.Empty)
                 rightyzList.Add(proRight.FCodeRule);
             if (proRight.FStatus1 == 1)
@@ -1785,6 +1804,7 @@ namespace WpfApp1
                         barCount += 1;
                     }
                     beforeLeftList = beforeBarList;
+                    fc = fid.ToString();
                 }
             }
 
@@ -1866,7 +1886,7 @@ namespace WpfApp1
             }
             //上工序 left
             long fid = dal.QueryBeforeLR("滑轨马达组件装配", barcode, product.FXingHao);
-            if (fid > 0 && !leftMark1)
+            if (fid > 0 && !leftMark)
             {
                 var beforeBarList = dal.GetBarCodeList(fid);
                 if (beforeBarList != null && beforeBarList.Any())
@@ -1874,10 +1894,11 @@ namespace WpfApp1
                     //barList.AddRange(beforeBarList);
                     if (!beforeLeftList.Exists(t => t == barcode))
                     {
-                        barCount1 += 1;
+                        barCount += 1;
                     }
                     beforeLeftList = beforeBarList;
                 }
+                fc = fid.ToString();
             }
             //上工序 right
             long fidr = dal.QueryBeforeLR("滑轨马达组件装配", barcode, rightproduct.FXingHao);
@@ -1889,38 +1910,29 @@ namespace WpfApp1
                     //barList.AddRange(beforeBarList);
                     if (!beforeRightList.Exists(t => t == barcode))
                     {
-                        rightbarCount1 += 1;
+                        rightbarCount += 1;
                     }
                     beforeRightList = beforeBarList;
                 }
+                fcr = fidr.ToString();
             }
 
-            // 左右滑轨
-            if (barCount == product.FCodeSum - 1 && !leftMark)
+            // 
+            if (barCount == product.FCodeSum  && !leftMark)
             {
                 // write plc 
                 splc.Write(service.GetSaoMaStr(config.GWNo, 0), 2);
+                barList.AddRange(beforeLeftList);
                 leftMark = true;
             }
-            if (rightbarCount == rightproduct.FCodeSum - 1 && !rightMark)
+            if (rightbarCount == rightproduct.FCodeSum && !rightMark)
             {
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
+                rightbarList.AddRange(beforeRightList);
                 rightMark = true;
             }
-            // 水平电机支架总成
-            if (barCount1 == 1 && !leftMark1)
-            {
-                splc.Write("DB4000.1770", 2);
-                barList.AddRange(beforeLeftList);
-                leftMark1 = true;
-            }
-            if (rightbarCount1 == 1 && !rightMark1)
-            {
-                splc.Write("DB4000.1771", 2);
-                rightbarList.AddRange(beforeRightList);
-                rightMark1 = true;
-            }
+            
 
             Dispatcher.InvokeAsync(() =>
             {
@@ -2138,19 +2150,23 @@ namespace WpfApp1
         {
             Barcode1.Text = "";
             Barcode2.Text = "";
-            Barcode3.Text = "";
-            Barcode4.Text = "";
             BarYz.Text = "";
-            BarYz_Copy.Text = "";
             barList.Clear();
             barCount = 0;
+            elist.Clear();
+            leftMark = false;
+            beforeLeftList.Clear();
+        }
+
+        private void ClearInforight()
+        {
+            Barcode3.Text = "";
+            Barcode4.Text = "";
+            BarYz_Copy.Text = "";
             rightbarList.Clear();
             rightbarCount = 0;
-            elist.Clear();
             rightelist.Clear();
-            leftMark = false;
             rightMark = false;
-            beforeLeftList.Clear();
             beforeRightList.Clear();
         }
     }
