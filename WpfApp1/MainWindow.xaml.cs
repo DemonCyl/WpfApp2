@@ -134,10 +134,10 @@ namespace WpfApp1
                 InitGw();
 
                 #region PLC连接定时器
-                //timer = new System.Windows.Threading.DispatcherTimer();
-                //timer.Tick += new EventHandler(ThreadCheck);
-                //timer.Interval = new TimeSpan(0, 0, 0, 5);
-                //timer.Start();
+                timer = new System.Windows.Threading.DispatcherTimer();
+                timer.Tick += new EventHandler(ThreadCheck);
+                timer.Interval = new TimeSpan(0, 0, 0, 5);
+                timer.Start();
                 #endregion
 
                 #region cancel
@@ -656,93 +656,101 @@ namespace WpfApp1
                     #endregion
 
                     // 读取保存信号
-                    var saveSingal = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 0));
-                    if (saveSingal.IsSuccess)
+                    if (IsOn)
                     {
-                        if (saveSingal.Content)
+                        var saveSingal = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 0));
+                        if (saveSingal.IsSuccess)
                         {
-                            if (!saveMark)
+                            if (saveSingal.Content)
                             {
-                                //log.Debug(service.GetReadSaveStr(config.GWNo, 0));
-                                bool save = false;
-                                string process = "";
-                                switch (config.GWNo)
+                                if (!saveMark)
                                 {
-                                    case 04051:
-                                        process = "上部框架预装";
-                                        //save = dal.SaveInfo(product.FInterID, process, barList, null);
-                                        save = dal.UpdateData40512(FIntryID);
-                                        //log.Debug(save);
-                                        break;
-                                    case 04062:
-                                        process = "H型滑轨装配";
-                                        //save = dal.SaveInfo(product.FInterID, process, barList, ReList);
-                                        save = dal.UpdateData4062(FIntryID, ReList);
-                                        break;
-                                }
-                                if (save)
-                                {
-                                    FIntryID = 0;
-                                    splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
-                                    saveMark = true;
-                                    barList.Clear();
-                                    barCount = 0;
-                                    elist.Clear();
-                                    leftMark = false;
-                                    leftMark1 = false;
-                                    barCount1 = 0;
-                                    beforeLeftList.Clear();
+                                    //log.Debug(service.GetReadSaveStr(config.GWNo, 0));
+                                    bool save = false;
+                                    string process = "";
+                                    switch (config.GWNo)
+                                    {
+                                        case 04051:
+                                            process = "上部框架预装";
+                                            //save = dal.SaveInfo(product.FInterID, process, barList, null);
+                                            save = dal.UpdateData40512(FIntryID);
+                                            //log.Debug(save);
+                                            break;
+                                        case 04062:
+                                            process = "H型滑轨装配";
+                                            //save = dal.SaveInfo(product.FInterID, process, barList, ReList);
+                                            save = dal.UpdateData4062(FIntryID, ReList);
+                                            break;
+                                    }
+                                    if (save)
+                                    {
+                                        FIntryID = 0;
+                                        LXCode = "";
+                                        CBCode = "";
+                                        splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
+                                        saveMark = true;
+                                        barList.Clear();
+                                        barCount = 0;
+                                        elist.Clear();
+                                        leftMark = false;
+                                        leftMark1 = false;
+                                        barCount1 = 0;
+                                        beforeLeftList.Clear();
+                                    }
                                 }
                             }
+                            else
+                            {
+                                saveMark = false;
+                            }
                         }
-                        else
-                        {
-                            saveMark = false;
-                        }
-                    }
 
-                    var saveSingal1 = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 1));
-                    if (saveSingal1.IsSuccess)
-                    {
-                        if (saveSingal1.Content)
+                        var saveSingal1 = splc.ReadBool(service.GetReadSaveStr(config.GWNo, 1));
+                        if (saveSingal1.IsSuccess)
                         {
-                            if (!saveMark1)
+                            if (saveSingal1.Content)
                             {
-                                //log.Debug(service.GetReadSaveStr(config.GWNo, 1));
-                                bool save = false;
-                                string process = "";
-                                switch (config.GWNo)
+                                if (!saveMark1)
                                 {
-                                    case 04051:
-                                        process = "前管装配";
-                                        //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, ReList);
-                                        save = dal.UpdateData40511(FIntryIDRight, ReList);
-                                        //log.Debug(save);
-                                        break;
-                                    case 04062:
-                                        process = "H型滑轨装配";
-                                        //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, rightReList);
-                                        save = dal.UpdateData4062(FIntryIDRight, rightReList);
-                                        break;
-                                }
-                                if (save)
-                                {
-                                    FIntryIDRight = 0;
-                                    splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
-                                    saveMark1 = true;
-                                    rightbarList.Clear();
-                                    rightbarCount = 0;
-                                    rightelist.Clear();
-                                    rightMark = false;
-                                    rightMark1 = false;
-                                    rightbarCount1 = 0;
-                                    beforeRightList.Clear();
+                                    //log.Debug(service.GetReadSaveStr(config.GWNo, 1));
+                                    //Thread.Sleep();
+                                    bool save = false;
+                                    string process = "";
+                                    switch (config.GWNo)
+                                    {
+                                        case 04051:
+                                            process = "前管装配";
+                                            //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, ReList);
+                                            save = dal.UpdateData40511(FIntryIDRight, ReList);
+                                            //log.Debug(save);
+                                            break;
+                                        case 04062:
+                                            process = "H型滑轨装配";
+                                            //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, rightReList);
+                                            save = dal.UpdateData4062(FIntryIDRight, rightReList);
+                                            break;
+                                    }
+                                    if (save)
+                                    {
+                                        FIntryIDRight = 0;
+                                        DJCode = "";
+                                        QGCode = "";
+                                        splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
+                                        saveMark1 = true;
+                                        rightbarList.Clear();
+                                        rightbarCount = 0;
+                                        rightelist.Clear();
+                                        rightMark = false;
+                                        rightMark1 = false;
+                                        rightbarCount1 = 0;
+                                        beforeRightList.Clear();
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            saveMark1 = false;
+                            else
+                            {
+                                saveMark1 = false;
+                            }
                         }
                     }
 
@@ -1481,13 +1489,24 @@ namespace WpfApp1
             switch (config.GWNo)
             {
                 case 04051:
+                    codename1.Content = "L型条码:";
+                    codename2.Content = "侧板条码:";
+                    codename3.Content = "上工序条码:";
+                    codename4.Content = "电机条码:";
+                    codename5.Content = "前管条码:";
                     process = "上部框架预装";
                     processRight = "前管装配";
                     xh = 1;
                     xh1 = 1;
                     break;
                 case 04062:
-                    ChangeMenuItem.Visibility = Visibility.Hidden;
+                    //ChangeMenuItem.Visibility = Visibility.Hidden;
+
+                    codename1.Content = "左侧条码:";
+                    codename2.Content = "";
+                    codename3.Content = "";
+                    codename4.Content = "右侧条码:";
+                    codename5.Content = "";
                     process = "H型滑轨装配";
                     processRight = "H型滑轨装配";
                     xh = 2;
@@ -1531,8 +1550,15 @@ namespace WpfApp1
                     XingHao2.Text = "副驾";
                     break;
             }
+            if (config.GWNo == 04051)
+            {
 
-            BarRule.Text = "左侧：";
+                BarRule.Text = "上框架预装：";
+            }
+            else
+            {
+                BarRule.Text = "H型滑轨：";
+            }
             BarRule.Text += "\r\n电机:" + pro.FDianJiCodeRule;
             if (pro.FDianJiCodeRule != string.Empty)
                 yzList.Add(pro.FDianJiCodeRule);
@@ -1555,7 +1581,15 @@ namespace WpfApp1
                     yzList.Add(pro.FCeBanCodeRule);
             }
 
-            BarRule_Right.Text = "右侧：";
+            if (config.GWNo == 04051)
+            {
+
+                BarRule_Right.Text = "前管装配：";
+            }
+            else
+            {
+                BarRule_Right.Text = "H型滑轨：";
+            }
             BarRule_Right.Text += "\r\n电机:" + proRight.FDianJiCodeRule;
             if (proRight.FDianJiCodeRule != string.Empty)
                 rightyzList.Add(proRight.FDianJiCodeRule);
@@ -1823,7 +1857,7 @@ namespace WpfApp1
                 last = true;
             }
 
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
                 if (!leftMark)
                 {
@@ -1847,31 +1881,61 @@ namespace WpfApp1
                     }
                     else if (lx)
                     {
+                        if (Barcode2.Background == Brushes.Red)
+                        {
+                            Barcode2.Text = "";
+                            Barcode2.Background = Brushes.SteelBlue;
+                        }
+                        if (Barcode3.Background == Brushes.Red)
+                        {
+                            Barcode3.Text = "";
+                            Barcode3.Background = Brushes.SteelBlue;
+                        }
                         Barcode1.Text = barcode;
                         Barcode1.Background = Brushes.SteelBlue;
                     }
                     else if (cb)
                     {
+                        if (Barcode1.Background == Brushes.Red)
+                        {
+                            Barcode1.Text = "";
+                            Barcode1.Background = Brushes.SteelBlue;
+                        }
+                        if (Barcode3.Background == Brushes.Red)
+                        {
+                            Barcode3.Text = "";
+                            Barcode3.Background = Brushes.SteelBlue;
+                        }
                         Barcode2.Text = barcode;
                         Barcode2.Background = Brushes.SteelBlue;
                     }
                     else if (last)
                     {
+                        if (Barcode2.Background == Brushes.Red)
+                        {
+                            Barcode2.Text = "";
+                            Barcode2.Background = Brushes.SteelBlue;
+                        }
+                        if (Barcode1.Background == Brushes.Red)
+                        {
+                            Barcode1.Text = "";
+                            Barcode1.Background = Brushes.SteelBlue;
+                        }
                         Barcode3.Text = barcode;
                         Barcode3.Background = Brushes.SteelBlue;
                     }
 
                     if (string.IsNullOrEmpty(LXCode) && string.IsNullOrEmpty(CBCode))
                     {
-                        LeftError.Text = "条码匹配失败！";
+                        LeftError.Text = last ? "" : "条码匹配失败！";
                     }
                     else if (!string.IsNullOrEmpty(LXCode) && string.IsNullOrEmpty(CBCode))
                     {
-                        LeftError.Text = "侧板条码匹配失败！";
+                        LeftError.Text = "侧板组件未扫码！";
                     }
                     else if (string.IsNullOrEmpty(LXCode) && !string.IsNullOrEmpty(CBCode))
                     {
-                        LeftError.Text = "L型条码匹配失败！";
+                        LeftError.Text = "L型组件未码！";
                     }
                     else if (!last)
                     {
@@ -1903,7 +1967,8 @@ namespace WpfApp1
         /// <param name="barcode"></param>
         private void BarCodeMatch(string barcode)
         {
-            bool barmark = false;
+            bool left = false;
+            bool right = false;
             bool fcmark = false;
             bool fcrmark = false;
 
@@ -1913,7 +1978,7 @@ namespace WpfApp1
             {
                 barCount += 1;
                 fcmark = true;
-                barmark = true;
+                left = true;
             }
             //上工序 right
             FIntryIDRight = dal.QueryBefore4062(barcode, rightproduct.FXingHao);
@@ -1921,44 +1986,54 @@ namespace WpfApp1
             {
                 rightbarCount += 1;
                 fcrmark = true;
+                right = true;
             }
 
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
-                if (barmark)
+                if (!left && !right)
                 {
-                    switch (barCount % 2)
+                    if (!leftMark)
                     {
-                        case 0:
-                            Barcode2.Text = barcode;
-                            break;
-                        case 1:
-                            Barcode1.Text = barcode;
-                            break;
+                        Barcode1.Text = barcode;
+                        Barcode1.Background = Brushes.Red;
                     }
-
+                    else
+                    {
+                        Barcode4.Text = barcode;
+                        Barcode4.Background = Brushes.Red;
+                    }
                 }
-                else
+                else if (left && !leftMark)
                 {
-
-                    switch (rightbarCount % 2)
+                    if (Barcode4.Background == Brushes.Red)
                     {
-                        case 0:
-                            Barcode4.Text = barcode;
-                            break;
-                        case 1:
-                            Barcode3.Text = barcode;
-                            break;
+                        Barcode4.Text = "";
+                        Barcode4.Background = Brushes.SteelBlue;
                     }
+                    Barcode1.Text = barcode;
+                    Barcode1.Background = Brushes.SteelBlue;
+                }
+                else if (right && !rightMark)
+                {
+                    if (Barcode1.Background == Brushes.Red)
+                    {
+                        Barcode1.Text = "";
+                        Barcode1.Background = Brushes.SteelBlue;
+                    }
+                    Barcode4.Text = barcode;
+                    Barcode4.Background = Brushes.SteelBlue;
                 }
 
                 if (!fcmark && !fcrmark)
                 {
                     BarYz.Text = "NG";
+                    ErrorInfo_Copy.Text = "该条码上工序无数据！";
                 }
                 else
                 {
                     BarYz.Text = "OK";
+                    ErrorInfo_Copy.Text = "";
                 }
 
             });
@@ -2018,7 +2093,7 @@ namespace WpfApp1
                 }
             }
 
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
                 if (!rightMark)
                 {
@@ -2050,13 +2125,13 @@ namespace WpfApp1
                     {
                         RightError.Text = "条码匹配失败！";
                     }
-                    else if (!string.IsNullOrEmpty(DJCode) && string.IsNullOrEmpty(QGCode))
-                    {
-                        RightError.Text = "前管条码匹配失败！";
-                    }
                     else if (string.IsNullOrEmpty(DJCode) && !string.IsNullOrEmpty(QGCode))
                     {
-                        RightError.Text = "电机条码匹配失败！";
+                        RightError.Text = "电机未扫码！";
+                    }
+                    else if (!string.IsNullOrEmpty(DJCode) && string.IsNullOrEmpty(QGCode))
+                    {
+                        RightError.Text = "前管组件未扫码！";
                     }
                     else
                     {
@@ -2071,7 +2146,11 @@ namespace WpfApp1
             {
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
-                FIntryIDRight = dal.SaveBarCode405(rightproduct.FXingHao, DJCode, QGCode);
+                FIntryIDRight = dal.check405(rightproduct.FXingHao, DJCode, QGCode);
+                if (FIntryIDRight <= 0)
+                {
+                    FIntryIDRight = dal.SaveBarCode405(rightproduct.FXingHao, DJCode, QGCode);
+                }
                 rightMark = true;
             }
 
@@ -2196,14 +2275,44 @@ namespace WpfApp1
                     Start(productConfig, productConfig1);
                 }
             }
+            else if (config.GWNo == 4062)
+            {
+                string process = "H型滑轨装配";
+                string processRight = "H型滑轨装配";
+                int xh = 0;
+                int xh1 = 0;
+                switch (product.FXingHao)
+                {
+                    case 1:
+                        xh = 2;
+                        xh1 = 1;
+                        break;
+                    case 2:
+                        xh = 1;
+                        xh1 = 2;
+                        break;
+                }
+
+                ProductConfig productConfig = Gwlist.Find(f => f.FGWItem.Equals(process) && f.FXingHao == xh);
+                ProductConfig productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == xh1);
+
+                if (productConfig != null && productConfig1 != null)
+                {
+                    Start(productConfig, productConfig1);
+                }
+            }
         }
 
         private void ClearInfo()
         {
+            LeftError.Text = "";
+            ErrorInfo_Copy.Text = "";
             FIntryID = 0;
             Barcode1.Text = "";
             Barcode2.Text = "";
             Barcode3.Text = "";
+            LXCode = "";
+            CBCode = "";
             Barcode1.Background = Brushes.SteelBlue;
             Barcode2.Background = Brushes.SteelBlue;
             Barcode3.Background = Brushes.SteelBlue;
@@ -2217,9 +2326,13 @@ namespace WpfApp1
 
         private void ClearInforight()
         {
+            RightError.Text = "";
+            ErrorInfo_Copy.Text = "";
             FIntryIDRight = 0;
             Barcode5.Text = "";
             Barcode4.Text = "";
+            QGCode = "";
+            DJCode = "";
             Barcode4.Background = Brushes.SteelBlue;
             Barcode5.Background = Brushes.SteelBlue;
             BarYz_Copy.Text = "";

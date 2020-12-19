@@ -229,8 +229,8 @@ namespace WpfApp1.DAL
         public long SaveBarCode405(int XingHao, string DianJiCode, string QianGuanCode)
         {
             long id = 0;
-            string sql = @" INSERT INTO ProcessInfo (FXingHao,FDianJiBarCode,FQianGuanBarCode,FOnTime40511) values 
-                             (@F1,@F2,@F3, GETDATE());select SCOPE_IDENTITY();";
+            string sql = @" INSERT INTO ProcessInfo (FXingHao,FDianJiBarCode,FQianGuanBarCode,FGW,FOnTime40511) values 
+                             (@F1,@F2,@F3,@F4, GETDATE());select SCOPE_IDENTITY();";
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
@@ -242,6 +242,7 @@ namespace WpfApp1.DAL
                     cmd.Parameters.AddWithValue("@F1", XingHao);
                     cmd.Parameters.AddWithValue("@F2", DianJiCode);
                     cmd.Parameters.AddWithValue("@F3", QianGuanCode);
+                    cmd.Parameters.AddWithValue("@F4", "405");
 
                     id = Convert.ToInt64(cmd.ExecuteScalar());
 
@@ -262,8 +263,10 @@ namespace WpfApp1.DAL
             GDbData data2 = new GDbData();
             if (list != null)
             {
+                //log.Info(list.Count);
                 for (int i = 0; i < list.Count; i++)
                 {
+                    //log.Info(i);
                     switch (i)
                     {
                         case 0:
@@ -400,8 +403,8 @@ namespace WpfApp1.DAL
         public long SaveBarCode406(int XingHao, string DianJiCode)
         {
             long id = 0;
-            string sql = @" INSERT INTO ProcessInfo (FXingHao,FDianJiBarCode,FOnTime4061) values 
-                             (@F1,@F2, GETDATE());select SCOPE_IDENTITY();";
+            string sql = @" INSERT INTO ProcessInfo (FXingHao,FDianJiBarCode,FGW,FOnTime4061) values 
+                             (@F1,@F2,@F3, GETDATE());select SCOPE_IDENTITY();";
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
@@ -412,6 +415,7 @@ namespace WpfApp1.DAL
                     SqlCommand cmd = new SqlCommand(sql, conn, tran);
                     cmd.Parameters.AddWithValue("@F1", XingHao);
                     cmd.Parameters.AddWithValue("@F2", DianJiCode);
+                    cmd.Parameters.AddWithValue("@F3", "406");
 
                     id = Convert.ToInt64(cmd.ExecuteScalar());
 
@@ -561,6 +565,28 @@ namespace WpfApp1.DAL
                     F2 = data1.Angle,
                     Id = fid,
                 }) > 0;
+            }
+        }
+
+        public long check406(string barcode, int xinghao)
+        {
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barcode}' ) and (t.F4061Status is null or t.F4061Status != 1) and t.FGW = '406' and FXingHao = {xinghao}";
+
+            using (var conn = new DbHelperSQL(config).GetConnection())
+            {
+                var re = conn.QueryFirstOrDefault<long>(sql);
+                return re;
+            }
+        }
+
+        public long check405(int XingHao, string DianJiCode, string QianGuanCode)
+        {
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{DianJiCode}' and t.FQianGuanBarCode = '{QianGuanCode}') and (t.F40511Status is null or t.F40511Status != 1) and t.FGW = '405' and FXingHao = {XingHao}";
+
+            using (var conn = new DbHelperSQL(config).GetConnection())
+            {
+                var re = conn.QueryFirstOrDefault<long>(sql);
+                return re;
             }
         }
     }
