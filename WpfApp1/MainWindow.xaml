@@ -53,9 +53,9 @@
                                     </Grid.ColumnDefinitions>
                                     <Image Source="{Binding Status}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="15" Height="13"/>
                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" TextWrapping="Wrap"
-                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="10"/>
                                     <TextBlock Text="{Binding sType}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Visibility="Hidden"
-                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="10"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -81,9 +81,9 @@
                                     </Grid.ColumnDefinitions>
                                     <Image Source="{Binding Status}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="15" Height="13"/>
                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" TextWrapping="Wrap"
-                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="10"/>
                                     <TextBlock Text="{Binding sType}" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" Visibility="Hidden"
-                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"/>
+                                               Height="Auto" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="10"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -210,7 +210,7 @@
                 <TextBlock x:Name="XingHao1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei" FontSize="11"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="45" Canvas.Left="85" Canvas.Top="380"/>
                 <TextBlock x:Name="Barcode1" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
-                    TextWrapping="Wrap" Text="35277172008240015" VerticalAlignment="Top" Height="13" Width="121" Canvas.Left="249" Canvas.Top="334"/>
+                    TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="13" Width="121" Canvas.Left="249" Canvas.Top="334"/>
                 <TextBlock x:Name="BarRule" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="10"
                     TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="81" Width="81" Canvas.Left="373" Canvas.Top="332"/>
                 <TextBlock x:Name="BarYz" HorizontalAlignment="Left" Foreground="#F0E68C" FontFamily="Microsoft Yahei"  FontSize="11"
@@ -303,8 +303,8 @@
                 <Label Canvas.Left="190" Canvas.Top="366" x:Name="codename3" Content="条码:" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
                 <Label Canvas.Left="190" Canvas.Top="384" x:Name="codename4" Content="条码:" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
                 <Label Canvas.Left="190" Canvas.Top="400" x:Name="codename5" Content="条码:" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
-                <Label Canvas.Left="126" Canvas.Top="330" x:Name="codename1_Copy" Content="上框架预装:" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
-                <Label Canvas.Left="123" Canvas.Top="384" x:Name="codename1_Copy1" Content="前管装配:" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
+                <Label Canvas.Left="126" Canvas.Top="330" x:Name="leftname" Content="" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
+                <Label Canvas.Left="123" Canvas.Top="384" x:Name="rightname" Content="" HorizontalContentAlignment="Right" FontFamily="Microsoft Yahei" FontSize="10" Foreground="#F0E68C" Width="62"/>
                 <!--<ListView x:Name="listView_Copy" ItemsSource="{Binding .}" Canvas.Top="64" Height="264" Width="40" Background="#EE3BABFF" FontFamily="Microsoft Yahei" Canvas.Left="10" Foreground="White" >
                     <ListView.Resources>
                         <Style TargetType="{x:Type GridViewColumnHeader}" >

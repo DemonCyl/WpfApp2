@@ -1494,6 +1494,8 @@ namespace WpfApp1
                     codename3.Content = "上工序条码:";
                     codename4.Content = "电机条码:";
                     codename5.Content = "前管条码:";
+                    leftname.Content = "上框架预装:";
+                    rightname.Content = "前管装配:";
                     process = "上部框架预装";
                     processRight = "前管装配";
                     xh = 1;
@@ -1507,6 +1509,8 @@ namespace WpfApp1
                     codename3.Content = "";
                     codename4.Content = "右侧条码:";
                     codename5.Content = "";
+                    leftname.Content = "";
+                    rightname.Content = "";
                     process = "H型滑轨装配";
                     processRight = "H型滑轨装配";
                     xh = 2;
@@ -1557,11 +1561,13 @@ namespace WpfApp1
             }
             else
             {
-                BarRule.Text = "H型滑轨：";
+                BarRule.Text = "左侧H型滑轨：";
             }
-            BarRule.Text += "\r\n电机:" + pro.FDianJiCodeRule;
             if (pro.FDianJiCodeRule != string.Empty)
+            {
+                BarRule.Text += "\r\n电机:" + pro.FDianJiCodeRule;
                 yzList.Add(pro.FDianJiCodeRule);
+            }
             if (pro.FStatus1 == 1)
             {
                 BarRule.Text += "\r\n前管:" + pro.FQianGuanCodeRule;
@@ -1588,11 +1594,13 @@ namespace WpfApp1
             }
             else
             {
-                BarRule_Right.Text = "H型滑轨：";
+                BarRule_Right.Text = "右侧H型滑轨：";
             }
-            BarRule_Right.Text += "\r\n电机:" + proRight.FDianJiCodeRule;
             if (proRight.FDianJiCodeRule != string.Empty)
+            {
+                BarRule_Right.Text += "\r\n电机:" + proRight.FDianJiCodeRule;
                 rightyzList.Add(proRight.FDianJiCodeRule);
+            }
             if (proRight.FStatus1 == 1)
             {
                 BarRule_Right.Text += "\r\n前管:" + proRight.FQianGuanCodeRule;
