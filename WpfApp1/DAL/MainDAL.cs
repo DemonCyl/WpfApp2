@@ -57,7 +57,7 @@ namespace WpfApp1.DAL
 
         public long QueryBefore4062(string barCode, int xinghao)
         {
-            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' ) and t.F4061Status = 1 and t.FXingHao = {xinghao} and (t.F4061Status is null or t.F4061Status != 1) ";
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' ) and t.F4061Status = 1 and t.FXingHao = {xinghao} and (t.F4062Status is null or t.F4062Status != 1) ";
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {

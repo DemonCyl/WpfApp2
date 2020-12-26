@@ -46,9 +46,9 @@ namespace WpfApp1
         private BarCodeStr codeStr;
         private ProductConfig product;
         private ProductConfig rightproduct;
-        private SerialPort serialPort;
-        private SerialPort serialPortLeft;
-        private SerialPort serialPortRight;
+        private SerialPort serialPort = null;
+        private SerialPort serialPortLeft = null;
+        private SerialPort serialPortRight = null;
         //private Plc plc;
         private SiemensS7Net splc;
         private OperateResult connect;
@@ -2241,6 +2241,10 @@ namespace WpfApp1
                 serialPort.Close();
                 serialPort = null;
             }
+            else
+            {
+                serialPort = null;
+            }
         }
 
         private void PortClose2()
@@ -2250,9 +2254,18 @@ namespace WpfApp1
                 serialPortLeft.Close();
                 serialPortLeft = null;
             }
+            else
+            {
+                serialPortLeft = null;
+            }
+
             if (serialPortRight != null && serialPortRight.IsOpen)
             {
                 serialPortRight.Close();
+                serialPortRight = null;
+            }
+            else
+            {
                 serialPortRight = null;
             }
         }
