@@ -684,18 +684,21 @@ namespace WpfApp1
                                     }
                                     if (save)
                                     {
-                                        FIntryID = 0;
-                                        LXCode = "";
-                                        CBCode = "";
-                                        splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
-                                        saveMark = true;
-                                        barList.Clear();
-                                        barCount = 0;
-                                        elist.Clear();
-                                        leftMark = false;
-                                        leftMark1 = false;
-                                        barCount1 = 0;
-                                        beforeLeftList.Clear();
+                                        var ss = splc.Write(service.GetWriteSaveStr(config.GWNo, 0), true);
+                                        if (ss.IsSuccess)
+                                        {
+                                            FIntryID = 0;
+                                            LXCode = "";
+                                            CBCode = "";
+                                            saveMark = true;
+                                            barList.Clear();
+                                            barCount = 0;
+                                            elist.Clear();
+                                            leftMark = false;
+                                            leftMark1 = false;
+                                            barCount1 = 0;
+                                            beforeLeftList.Clear();
+                                        }
                                     }
                                 }
                             }
@@ -732,18 +735,21 @@ namespace WpfApp1
                                     }
                                     if (save)
                                     {
-                                        FIntryIDRight = 0;
-                                        DJCode = "";
-                                        QGCode = "";
-                                        splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
-                                        saveMark1 = true;
-                                        rightbarList.Clear();
-                                        rightbarCount = 0;
-                                        rightelist.Clear();
-                                        rightMark = false;
-                                        rightMark1 = false;
-                                        rightbarCount1 = 0;
-                                        beforeRightList.Clear();
+                                        var ss1 = splc.Write(service.GetWriteSaveStr(config.GWNo, 1), true);
+                                        if (ss1.IsSuccess)
+                                        {
+                                            FIntryIDRight = 0;
+                                            DJCode = "";
+                                            QGCode = "";
+                                            saveMark1 = true;
+                                            rightbarList.Clear();
+                                            rightbarCount = 0;
+                                            rightelist.Clear();
+                                            rightMark = false;
+                                            rightMark1 = false;
+                                            rightbarCount1 = 0;
+                                            beforeRightList.Clear();
+                                        }
                                     }
                                 }
                             }
