@@ -91,6 +91,7 @@ namespace WpfApp1
         private string QGCode = null;
         private string LXCode = null;
         private string CBCode = null;
+        private int number = 0;
 
         public MainWindow()
         {
@@ -185,6 +186,7 @@ namespace WpfApp1
             catch (Exception e)
             {
                 log.Error(e.Message);
+                ErrorInfo.Text = e.Message;
             }
 
         }
@@ -1487,7 +1489,14 @@ namespace WpfApp1
 
         private void InitGw()
         {
-            Gwlist = dal.QueryItem();
+            try
+            {
+                Gwlist = dal.QueryItem();
+            }
+            catch
+            {
+                throw new Exception("数据库连接出错!");
+            }
             string process = "";
             string processRight = "";
             int xh = 0;
@@ -1863,11 +1872,18 @@ namespace WpfApp1
                 }
             }
             //上工序 判断 
-            FIntryID = dal.QueryBefore4051(barcode);
-            if (FIntryID > 0 && !leftMark)
+            if (FIntryID == 0)
             {
-                barCount += 1;
-                fcmark = true;
+                FIntryID = dal.QueryBefore4051(barcode, product.FXingHao);
+                if (FIntryID > 0 && !leftMark)
+                {
+                    barCount += 1;
+                    fcmark = true;
+                    last = true;
+                }
+            }
+            else
+            {
                 last = true;
             }
 
@@ -2284,23 +2300,63 @@ namespace WpfApp1
                 string processRight = "前管装配";
                 int value = 0;
 
+                #region 一种
+                //switch (product.FXingHao)
+                //{
+                //    case 1:
+                //        value = 2;
+                //        break;
+                //    case 2:
+                //        value = 1;
+                //        break;
+                //}
+
+                //var productConfig = Gwlist.Find(f => f.FGWItem.Equals(process) && f.FXingHao == value);
+                //var productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == value);
+
+                //if (productConfig != null && productConfig1 != null)
+                //{
+                //    Start(productConfig, productConfig1);
+                //}
+                #endregion
+
+                #region 两种
                 switch (product.FXingHao)
                 {
                     case 1:
-                        value = 2;
+                        number += 1;
+                        if (number >= 2)
+                        {
+                            number = 0;
+                            value = 2;
+                        }
+                        else
+                        {
+                            value = 1;
+                        }
                         break;
                     case 2:
-                        value = 1;
+                        number += 1;
+                        if (number >= 2)
+                        {
+                            number = 0;
+                            value = 1;
+                        }
+                        else
+                        {
+                            value = 2;
+                        }
                         break;
                 }
 
-                ProductConfig productConfig = Gwlist.Find(f => f.FGWItem.Equals(process) && f.FXingHao == value);
-                ProductConfig productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == value);
+                var productConfig = Gwlist.FindAll(f => f.FGWItem.Equals(process) && f.FXingHao == value);
+                var productConfig1 = Gwlist.Find(f => f.FGWItem.Equals(processRight) && f.FXingHao == value);
 
                 if (productConfig != null && productConfig1 != null)
                 {
-                    Start(productConfig, productConfig1);
+                    Start(productConfig[number], productConfig1);
                 }
+                #endregion
             }
             else if (config.GWNo == 4062)
             {

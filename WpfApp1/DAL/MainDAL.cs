@@ -33,9 +33,9 @@ namespace WpfApp1.DAL
             }
         }
 
-        public long QueryBefore4051(string barCode)
+        public long QueryBefore4051(string barCode, int xinghao)
         {
-            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' or t.FQianGuanBarCode = '{barCode}') and t.F40511Status = 1 and (t.F40512Status is null or t.F40512Status != 1) ";
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' or t.FQianGuanBarCode = '{barCode}') and t.F40511Status = 1  and t.FXinghao={xinghao} ";  //and (t.F40512Status is null or t.F40512Status != 1)
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
@@ -57,7 +57,7 @@ namespace WpfApp1.DAL
 
         public long QueryBefore4062(string barCode, int xinghao)
         {
-            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' ) and t.F4061Status = 1 and t.FXingHao = {xinghao} and (t.F4062Status is null or t.F4062Status != 1) ";
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{barCode}' ) and t.F4061Status = 1 and t.FXingHao = {xinghao} "; // and (t.F4062Status is null or t.F4062Status != 1) ";
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
