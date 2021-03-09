@@ -1939,7 +1939,7 @@ namespace WpfApp1
                         Barcode2.Text = barcode;
                         Barcode2.Background = Brushes.SteelBlue;
                     }
-                    else if (last)
+                    else if (last && !lx && !cb)
                     {
                         if (Barcode2.Background == Brushes.Red)
                         {
