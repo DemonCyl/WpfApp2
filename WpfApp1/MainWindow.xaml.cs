@@ -681,7 +681,10 @@ namespace WpfApp1
                                         case 04062:
                                             process = "H型滑轨装配";
                                             //save = dal.SaveInfo(product.FInterID, process, barList, ReList);
-                                            save = dal.UpdateData4062(FIntryID, ReList);
+                                            if (ReList.Count >= 4)
+                                            {
+                                                save = dal.UpdateData4062(FIntryID, ReList);
+                                            }
                                             break;
                                     }
                                     if (save)
@@ -726,13 +729,19 @@ namespace WpfApp1
                                         case 04051:
                                             process = "前管装配";
                                             //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, ReList);
-                                            save = dal.UpdateData40511(FIntryIDRight, ReList);
+                                            if (ReList.Count >= 2)
+                                            {
+                                                save = dal.UpdateData40511(FIntryIDRight, ReList);
+                                            }
                                             //log.Debug(save);
                                             break;
                                         case 04062:
                                             process = "H型滑轨装配";
                                             //save = dal.SaveInfo(rightproduct.FInterID, process, rightbarList, rightReList);
-                                            save = dal.UpdateData4062(FIntryIDRight, rightReList);
+                                            if (rightReList.Count >= 4)
+                                            {
+                                                save = dal.UpdateData4062(FIntryIDRight, rightReList);
+                                            }
                                             break;
                                     }
                                     if (save)
@@ -2012,6 +2021,7 @@ namespace WpfApp1
             }
             //上工序 right
             FIntryIDRight = dal.QueryBefore4062(barcode, rightproduct.FXingHao);
+            //log.Debug(1+ " " + rightbarCount);
             if (FIntryIDRight > 0 && !rightMark)
             {
                 rightbarCount += 1;
@@ -2071,6 +2081,7 @@ namespace WpfApp1
             // 
             if (barCount == product.FCodeSum && !leftMark)
             {
+                //log.Debug(3 + "  " + barCount);
                 // write plc 
                 splc.Write(service.GetSaoMaStr(config.GWNo, 0), 2);
                 dal.UpdateBarCode4062(FIntryID);
@@ -2078,6 +2089,7 @@ namespace WpfApp1
             }
             if (rightbarCount == rightproduct.FCodeSum && !rightMark)
             {
+                //log.Debug(2+" "+rightbarCount);
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
                 dal.UpdateBarCode4062(FIntryIDRight);
@@ -2174,6 +2186,7 @@ namespace WpfApp1
 
             if (rightbarCount == rightproduct.FCodeSum && !rightMark)
             {
+                log.Debug(21 + " " + rightbarCount);
                 // write plc ???
                 splc.Write(service.GetSaoMaStr(config.GWNo, 1), 2);
                 FIntryIDRight = dal.check405(rightproduct.FXingHao, DJCode, QGCode);

@@ -62,6 +62,7 @@ namespace WpfApp1.DAL
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
                 var re = conn.QueryFirstOrDefault<long>(sql);
+                log.Debug(sql + "  " + re);
                 return re;
             }
         }
@@ -247,6 +248,7 @@ namespace WpfApp1.DAL
                     id = Convert.ToInt64(cmd.ExecuteScalar());
 
                     tran.Commit();
+                    log.Info("405Save: "+id);
                     return id;
                 }
                 catch (Exception ex)
@@ -282,6 +284,7 @@ namespace WpfApp1.DAL
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
+                log.Info(sql + "\r\n" + fid);
                 return conn.Execute(sql, new
                 {
                     F1 = data1.Torque,
@@ -298,6 +301,7 @@ namespace WpfApp1.DAL
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
+                log.Info(sql + "\r\n" + fid);
                 return conn.Execute(sql, new
                 {
                     Id = fid,
@@ -310,6 +314,7 @@ namespace WpfApp1.DAL
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
+                log.Info(sql + "\r\n" + fid);
                 return conn.Execute(sql, new
                 {
                     F1 = LXingCode,
@@ -475,6 +480,7 @@ namespace WpfApp1.DAL
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
+                log.Info(sql + "\r\n" + fid);
                 return conn.Execute(sql, new
                 {
                     Id = fid,
@@ -512,6 +518,7 @@ namespace WpfApp1.DAL
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
+                log.Info(sql + "\r\n" + fid);
                 return conn.Execute(sql, new
                 {
                     F1 = data1.Torque,
@@ -581,11 +588,12 @@ namespace WpfApp1.DAL
 
         public long check405(int XingHao, string DianJiCode, string QianGuanCode)
         {
-            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{DianJiCode}' and t.FQianGuanBarCode = '{QianGuanCode}') and (t.F40511Status is null or t.F40511Status != 1) and t.FGW = '405' and FXingHao = {XingHao}";
+            string sql = $"select t.FInterID from ProcessInfo t where (t.FDianJiBarCode = '{DianJiCode}' and t.FQianGuanBarCode = '{QianGuanCode}')  and t.FGW = '405' and FXingHao = {XingHao}"; //and (t.F40511Status is null or t.F40511Status != 1)
 
             using (var conn = new DbHelperSQL(config).GetConnection())
             {
                 var re = conn.QueryFirstOrDefault<long>(sql);
+                log.Info(sql + "\r\n" + re);
                 return re;
             }
         }
