@@ -54,6 +54,8 @@ namespace WpfApp1
         private OperateResult connect;
         private GDbStr GunStr;
         private int markN = 0;
+        private int listMark = 0;
+        private int listMarkRight = 0;
         private int barCount = 0;
         private int rightbarCount = 0;
         private int barCount1 = 0;
@@ -685,6 +687,10 @@ namespace WpfApp1
                                             {
                                                 save = dal.UpdateData4062(FIntryID, ReList);
                                             }
+                                            else
+                                            {
+                                                listMark += 1;
+                                            }
                                             break;
                                     }
                                     if (save)
@@ -703,7 +709,16 @@ namespace WpfApp1
                                             leftMark1 = false;
                                             barCount1 = 0;
                                             beforeLeftList.Clear();
+                                            listMark = 0;
                                         }
+                                    }
+                                    if (listMark >= 10) // 10次读取不完整拧紧枪数据自动NG
+                                    {
+                                        LeftError.Text = "拧紧枪数据读取不完整，请复位重做！";
+                                    }
+                                    else
+                                    {
+                                        LeftError.Text = "";
                                     }
                                 }
                             }
@@ -733,6 +748,10 @@ namespace WpfApp1
                                             {
                                                 save = dal.UpdateData40511(FIntryIDRight, ReList);
                                             }
+                                            else
+                                            {
+                                                listMarkRight += 1;
+                                            }
                                             //log.Debug(save);
                                             break;
                                         case 04062:
@@ -741,6 +760,10 @@ namespace WpfApp1
                                             if (rightReList.Count >= 4)
                                             {
                                                 save = dal.UpdateData4062(FIntryIDRight, rightReList);
+                                            }
+                                            else
+                                            {
+                                                listMarkRight += 1;
                                             }
                                             break;
                                     }
@@ -760,7 +783,16 @@ namespace WpfApp1
                                             rightMark1 = false;
                                             rightbarCount1 = 0;
                                             beforeRightList.Clear();
+                                            listMarkRight = 0;
                                         }
+                                    }
+                                    if (listMarkRight >= 10) // 10次读取不完整拧紧枪数据自动NG
+                                    {
+                                        RightError.Text = "拧紧枪数据读取不完整，请复位重做！";
+                                    }
+                                    else
+                                    {
+                                        RightError.Text = "";
                                     }
                                 }
                             }
@@ -2418,6 +2450,7 @@ namespace WpfApp1
             elist.Clear();
             leftMark = false;
             beforeLeftList.Clear();
+            listMark = 0;
         }
 
         private void ClearInforight()
@@ -2437,6 +2470,7 @@ namespace WpfApp1
             rightelist.Clear();
             rightMark = false;
             beforeRightList.Clear();
+            listMarkRight = 0;
         }
     }
 }
